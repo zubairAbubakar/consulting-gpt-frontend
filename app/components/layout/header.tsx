@@ -9,8 +9,8 @@ interface HeaderProps {
   sidebarCollapsed: boolean;
 }
 
-export function Header({ toggleSidebar, sidebarCollapsed }: HeaderProps) {
-  const [currentProject, setCurrentProject] = useState({
+export const Header = ({ toggleSidebar, sidebarCollapsed }: HeaderProps) => {
+  const [currentProject] = useState({
     name: 'Hip Replacement Dissolver',
     id: 'proj-123',
   });
