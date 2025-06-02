@@ -21,7 +21,7 @@ interface SidebarProps {
   setCollapsed: (collapsed: boolean) => void;
 }
 
-export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
+export const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
   const pathname = usePathname();
 
   const navItems = [

@@ -17,12 +17,3 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
 Card.displayName = 'Card';
 
 export { Card };
-
-// Let's skip dasboard for now, the next one should be:
-
-// Technology Input Form
-// - Clean form with generous input areas
-// - Rich text editor for abstract
-// - Interactive problem statement builder
-
-// For the forms may be with can use react forms with zod validation, and lets keep it simple
