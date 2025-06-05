@@ -1,0 +1,17 @@
+import { mapTechnology } from '@/app/mappers/technology-mapper';
+import { Technology } from '@/types/technology';
+
+const URL = `${process.env.NEXT_PUBLIC_API_URL}/technologies`;
+
+const getTechnology = async (id: string): Promise<Technology> => {
+  try {
+    const response = await fetch(`${URL}/${id}`);
+
+    return mapTechnology(await response.json());
+  } catch (error) {
+    console.error('Error fetching technology:', error);
+    throw new Error('Failed to fetch technology');
+  }
+};
+
+export default getTechnology;
