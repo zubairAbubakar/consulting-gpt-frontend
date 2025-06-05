@@ -1,4 +1,4 @@
-import { TechnologyInputForm } from '@/app/components/forms/technology-input-form';
+import { TechnologyInputForm } from '@/app/components/forms/technology-form';
 
 export default function NewTechnologyPage() {
   return (

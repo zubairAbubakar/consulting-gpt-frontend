@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import TechnologyInputForm from './components/forms/technology-input-form';
-import ReportDisplay from '@/app/components/ReportDisplay';
-import { number } from 'zod';
+import TechnologyInputForm from './components/forms/technology-form';
+import ReportDisplay from '@/app/technology/[technologyId]/page';
 
 export interface FormData {
   name: string;
@@ -37,12 +36,7 @@ const Index = () => {
             Fill out the form below to generate your comprehensive commercial viability report
           </p>
         </div>
-
-        {!showReport ? (
-          <TechnologyInputForm onSubmit={handleFormSubmit} />
-        ) : (
-          <ReportDisplay data={formData!} onBack={handleBackToForm} />
-        )}
+        <TechnologyInputForm />
       </div>
     </div>
   );
