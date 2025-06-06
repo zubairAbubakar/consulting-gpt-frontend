@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import TechnologyInputForm from './components/forms/technology-form';
-import ReportDisplay from '@/app/technology/[technologyId]/page';
 
 export interface FormData {
   name: string;

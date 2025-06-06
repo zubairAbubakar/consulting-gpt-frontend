@@ -1,10 +1,51 @@
+import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
-import { ArrowLeft, User, Mail, Briefcase, CheckCircle, Clock, Target } from 'lucide-react';
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Briefcase,
+  CheckCircle,
+  Clock,
+  Target,
+  Variable,
+  Siren,
+  Microscope,
+  Diff,
+  Notebook,
+  Key,
+  ArrowRightLeft,
+  ExternalLinkIcon,
+  FileTextIcon,
+  AwardIcon,
+} from 'lucide-react';
+import {
+  LightBulbIcon,
+  BeakerIcon,
+  ScaleIcon,
+  DocumentMagnifyingGlassIcon,
+  PresentationChartLineIcon,
+  BanknotesIcon,
+} from '@heroicons/react/24/outline';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
 import getTechnology from '@/actions/getTechnology';
+import { getComparisonAxes } from '@/actions/getComparisonAxes';
+import { getRelatedPatents } from '@/actions/getRelatedPatents';
+import { getRelatedPapers } from '@/actions/getRelatedPapers';
+import { BackToTopButton } from '@/app/components/back-to-top-button';
 
 interface TechnologyPageProps {
   params: {
@@ -13,170 +54,342 @@ interface TechnologyPageProps {
 }
 
 const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
-  const technology = await getTechnology(params.technologyId);
+  const { technologyId } = await params;
+  const [technology, comparisonAxes, relatedPatents, papers] = await Promise.all([
+    getTechnology(technologyId),
+    getComparisonAxes(technologyId),
+    getRelatedPatents(technologyId),
+    getRelatedPapers(technologyId),
+  ]);
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" style={{ maxWidth: '1000px', margin: '0 auto' }}>
       <div className="mb-6 flex items-center gap-4">
-        {/* <Button
-          onClick={() => window.history.back()}
-          variant="outline"
-          className="flex items-center gap-2 hover:bg-gray-50"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Form
-        </Button> */}
         <h2 className="text-2xl font-bold text-gray-800">Technology Analysis Report</h2>
       </div>
-
-      {/* Section 1: Project Overview */}
-      <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
-        <CardHeader className="rounded-t-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-6 text-white">
-          <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
-            <Briefcase className="h-5 w-5" />
-            Section 1: Project Overview
-          </CardTitle>
-          <CardDescription className="text-blue-100">
-            Comprehensive analysis of your project details
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 p-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-600">
-                <User className="h-4 w-4" />
-                Project Owner
-              </div>
-              <p className="text-lg font-semibold text-gray-800">{technology.name}</p>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-600">
-                <Mail className="h-4 w-4" />
-                Contact Email
-              </div>
-              <p className="text-lg font-semibold text-gray-800">{technology.numOfAxes}</p>
-            </div>
-          </div>
-          <Separator />
-          <div className="space-y-2">
-            <h4 className="font-medium text-gray-700">Technology Abstract</h4>
-            <p className="leading-relaxed text-gray-600">{technology.abstract}</p>
-          </div>
-          <div className="flex gap-2">
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              Complexity: {1}
-            </Badge>
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              Est. Duration: {2} weeks
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section 2: Analysis & Insights */}
-      <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
-        <CardHeader className="rounded-t-lg bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-6 text-white">
-          <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
-            <Target className="h-5 w-5" />
-            Section 2: Analysis & Insights
-          </CardTitle>
-          <CardDescription className="text-green-100">
-            Key insights and recommendations based on your project
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 p-6">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="space-y-3">
-              <h4 className="flex items-center gap-2 font-semibold text-gray-700">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                Key Focus Areas
-              </h4>
-              <ul className="space-y-1">{`testData `}</ul>
-            </div>
-            <div className="space-y-3">
-              <h4 className="font-semibold text-gray-700">Project Metrics</h4>
+      {/* Section 1: Technology Overview */}
+      <div id="overview">
+        <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
+          <CardHeader className="rounded-t-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-6 text-white">
+            <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
+              <Microscope className="h-5 w-5" />
+              Technology Overview
+            </CardTitle>
+            <CardDescription className="text-blue-100">
+              Full details of your technology
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 p-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Description Length:</span>
-                  <span className="font-medium">{} characters</span>
+                <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                  <Siren className="h-4 w-4" />
+                  Technology Name
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Word Count:</span>
-                  <span className="font-medium">{} words</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Detail Level:</span>
-                  <Badge variant={'High' === 'High' ? 'default' : 'secondary'}>{'High'}</Badge>
-                </div>
+                <p className="text-sm font-medium text-gray-600">{technology.name}</p>
               </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section 3: Recommendations & Next Steps */}
-      <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
-        <CardHeader className="rounded-t-lg bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-6 text-white">
-          <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
-            <Clock className="h-5 w-5" />
-            Section 3: Recommendations & Next Steps
-          </CardTitle>
-          <CardDescription className="text-purple-100">
-            Actionable recommendations for project success
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 p-6">
-          <div className="space-y-4">
-            <div>
-              <h4 className="mb-2 font-semibold text-gray-700">Recommended Timeline</h4>
-              <div className="rounded-lg bg-gray-50 p-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Planning Phase:</span>
-                    <span className="font-medium">1-2 weeks</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Development Phase:</span>
-                    <span className="font-medium">{Math.max(1, 3 - 1)} weeks</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Testing & Deployment:</span>
-                    <span className="font-medium">1 week</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="mb-2 font-semibold text-gray-700">Next Steps</h4>
               <div className="space-y-2">
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="mt-1 h-4 w-4 text-green-600" />
-                  <span className="text-gray-600">
-                    Define detailed project requirements and scope
-                  </span>
+                <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                  <Diff className="h-4 w-4" />
+                  Number of Axes
                 </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="mt-1 h-4 w-4 text-green-600" />
-                  <span className="text-gray-600">Create project timeline and milestones</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="mt-1 h-4 w-4 text-green-600" />
-                  <span className="text-gray-600">
-                    Identify required resources and team members
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="mt-1 h-4 w-4 text-green-600" />
-                  <span className="text-gray-600">
-                    Set up project management and communication tools
-                  </span>
-                </div>
+                <p className="text-sm font-medium text-gray-600">{technology.numOfAxes}</p>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <Separator />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                  <Notebook className="h-4 w-4" />
+                  Generated Problem statement
+                </div>
+                <p className="text-sm font-medium text-gray-600">{technology.problemStatement}</p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                  <Key className="h-4 w-4" />
+                  Generated Search Keywords
+                </div>
+                <p className="text-sm font-medium text-gray-600">{technology.searchKeywords}</p>
+              </div>
+            </div>
+            <Separator />
+            <div className="space-y-2">
+              <h4 className="text-lg font-semibold text-gray-700">Technology Abstract</h4>
+              <p className="text-sm font-medium leading-relaxed text-gray-600">
+                {technology.abstract}
+              </p>
+            </div>
+            {/* <div className="flex gap-2">
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                Complexity: {1}
+              </Badge>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                Est. Duration: {2} weeks
+              </Badge>
+            </div> */}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Section 2: Comparison Axis */}
+      <div id="comparison-axes">
+        <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
+          <CardHeader className="rounded-t-lg bg-gradient-to-r from-green-500 to-teal-600 px-6 py-6 text-white">
+            <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
+              <ScaleIcon className="h-5 w-5" />
+              Comparison Axes
+            </CardTitle>
+            <CardDescription className="text-green-100">
+              Detailed analysis of comparison axes
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <Table>
+              <TableCaption>Comparison axes for the technology: {technology.name}</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Axis Name</TableHead>
+                  <TableHead>Extreme 1</TableHead>
+                  <TableHead>Extreme 2</TableHead>
+                  <TableHead>Weight</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {comparisonAxes.map((axis) => (
+                  <TableRow key={axis.id}>
+                    <TableCell>{axis.axisName}</TableCell>
+                    <TableCell>{axis.extreme1}</TableCell>
+                    <TableCell>{axis.extreme2}</TableCell>
+                    <TableCell>{axis.weight}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Section 3: Related Patents */}
+      <div id="patents">
+        <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
+          <CardHeader className="rounded-t-lg bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-4 text-white">
+            {/* Adjusted py-6 to py-4 */}
+            <CardTitle className="flex items-center gap-2 text-xl font-semibold">
+              {/* Adjusted text-2xl to text-xl */}
+              <DocumentMagnifyingGlassIcon className="h-5 w-5" /> {/* Heroicon */}
+              Related Patents & Papers
+            </CardTitle>
+            <CardDescription className="text-purple-100">
+              Some related patents to your technology
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 p-6">
+            {relatedPatents && relatedPatents.length > 0 ? (
+              <div className="space-y-5">
+                {relatedPatents.map((doc) => (
+                  <div
+                    key={doc.id}
+                    className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-800/50"
+                  >
+                    <div className="mb-2 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+                      <h4 className="text-md font-semibold text-gray-800 dark:text-slate-100">
+                        {doc.name || 'N/A'}
+                      </h4>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className={`text-xs capitalize ${
+                            doc.type === 'patent'
+                              ? 'border-sky-500 text-sky-700 dark:border-sky-400 dark:text-sky-300'
+                              : 'border-amber-500 text-amber-700 dark:border-amber-400 dark:text-amber-300'
+                          }`}
+                        >
+                          {doc.type || 'N/A'}
+                        </Badge>
+                        {doc.documentId && (
+                          <Badge variant="secondary" className="text-xs">
+                            ID: {doc.documentId}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {doc.abstract && (
+                      <p className="mb-2 text-sm leading-relaxed text-gray-600 dark:text-slate-300">
+                        <span className="font-medium text-gray-700 dark:text-slate-200">
+                          Abstract:
+                        </span>{' '}
+                        {doc.abstract.length > 200
+                          ? `${doc.abstract.substring(0, 200)}...`
+                          : doc.abstract}
+                      </p>
+                    )}
+
+                    <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-slate-400 sm:grid-cols-2">
+                      {doc.publicationDate && (
+                        <p>
+                          <span className="font-medium">Published:</span>{' '}
+                          {formatDate(doc.publicationDate)}
+                        </p>
+                      )}
+                      {doc.inventors && (
+                        <p className="truncate">
+                          {' '}
+                          {/* Added truncate for potentially long lists */}
+                          <span className="font-medium">Inventors:</span> {doc.inventors}
+                        </p>
+                      )}
+                      {doc.assignees && (
+                        <p className="truncate">
+                          {' '}
+                          {/* Added truncate */}
+                          <span className="font-medium">Assignees:</span> {doc.assignees}
+                        </p>
+                      )}
+                    </div>
+
+                    {doc.url && (
+                      <div className="mt-3">
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          View Document <ExternalLinkIcon className="h-3 w-3" />
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-sm text-gray-500 dark:text-slate-400">
+                No related patents or papers found for this technology.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Section 4: Related Papers */}
+      <div id="papers">
+        <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
+          <CardHeader className="rounded-t-lg bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-4 text-white">
+            <CardTitle className="flex items-center gap-2 text-xl font-semibold">
+              <FileTextIcon className="h-5 w-5" />
+              Related Papers
+            </CardTitle>
+            <CardDescription className="text-amber-100">
+              Review relevant academic papers and research
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 p-6">
+            {papers && papers.length > 0 ? (
+              <div className="space-y-5">
+                {papers.map(
+                  (
+                    paper // Using RelatedPaper type
+                  ) => (
+                    <div
+                      key={paper.id} // Assuming 'id' is unique for the paper record
+                      className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-800/50"
+                    >
+                      <div className="mb-2 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
+                        <h4 className="text-md font-semibold text-gray-800 dark:text-slate-100">
+                          {paper.title || 'N/A'} {/* Using paper.title */}
+                        </h4>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className="border-amber-500 text-xs capitalize text-amber-700 dark:border-amber-400 dark:text-amber-300"
+                          >
+                            Paper
+                          </Badge>
+                          {paper.paperId && ( // Using paper.paperId
+                            <Badge variant="secondary" className="text-xs">
+                              ID: {paper.paperId}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+
+                      {paper.abstract && (
+                        <p className="mb-2 text-sm leading-relaxed text-gray-600 dark:text-slate-300">
+                          <span className="font-medium text-gray-700 dark:text-slate-200">
+                            Abstract:
+                          </span>{' '}
+                          {paper.abstract.length > 200
+                            ? `${paper.abstract.substring(0, 200)}...`
+                            : paper.abstract}
+                        </p>
+                      )}
+
+                      <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-slate-400 sm:grid-cols-2">
+                        {paper.publicationDate && ( // Using paper.publicationDate
+                          <p>
+                            <span className="font-medium">Published:</span>{' '}
+                            {formatDate(paper.publicationDate)}
+                          </p>
+                        )}
+                        {paper.authors && (
+                          <p className="truncate">
+                            <span className="font-medium">Authors:</span> {paper.authors}
+                          </p>
+                        )}
+                        {paper.journal && (
+                          <p className="truncate">
+                            <span className="font-medium">Journal:</span> {paper.journal}
+                          </p>
+                        )}
+                        {paper.citationCount !== undefined &&
+                          paper.citationCount > 0 && ( // Display citation count
+                            <p className="flex items-center gap-1">
+                              <AwardIcon className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-500" />
+                              <span className="font-medium">Citations:</span> {paper.citationCount}
+                            </p>
+                          )}
+                      </div>
+
+                      {paper.url && (
+                        <div className="mt-3">
+                          <a
+                            href={paper.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                          >
+                            View Paper <ExternalLinkIcon className="h-3 w-3" />
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  )
+                )}
+              </div>
+            ) : (
+              <p className="text-center text-sm text-gray-500 dark:text-slate-400">
+                No related papers found for this technology.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+      <BackToTopButton />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { TechnologyInputForm } from '@/app/components/forms/technology-form';
+import { TechnologyForm } from '@/app/components/forms/technology-form';
 
 export default function NewTechnologyPage() {
   return (
@@ -11,7 +11,7 @@ export default function NewTechnologyPage() {
           Enter the details of the technology you want to assess using shadcn/ui.
         </p>
       </div>
-      <TechnologyInputForm />
+      <TechnologyForm />
     </div>
   );
 }

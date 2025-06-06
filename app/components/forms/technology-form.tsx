@@ -56,22 +56,19 @@ export const TechnologyForm = () => {
     const loadingToastId = toast.loading('Processing your technology submission...');
 
     try {
-      // Simulate API delay for UX testing
-      // await new Promise(resolve => setTimeout(resolve, 2000));
       const response = await axios.post('http://localhost:8000/api/v1/technologies', values);
-
-      toast.success(`Technology "${values.name}" ready for next steps!`, {
+      toast.success(`Technology "${values.name}" has been submitted for evaluation!.`, {
         id: loadingToastId,
         description: `ID: ${response.data.id}. We'll guide you through the analysis.`,
-        duration: 5000,
+        duration: 7000,
         action: {
-          label: 'Next: Keywords',
-          onClick: () => router.push(`/technology/${response.data.id}/keywords`), // Example navigation
+          label: 'View Report',
+          onClick: () => router.push(`/technology/${response.data.id}/`),
         },
       });
+
       form.reset();
-      // Navigate to the next step in the horizontal nav, e.g., keywords, using the new ID
-      // router.push(`/technology/${response.data.id}/keywords`); // Or whatever the next step's path is
+      router.push(`/technology/${response.data.id}`);
     } catch (error) {
       let errorMessage = 'An unexpected error occurred. Please review your input and try again.';
       if (axios.isAxiosError(error) && error.response) {

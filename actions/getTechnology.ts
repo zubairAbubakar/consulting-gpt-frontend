@@ -6,7 +6,10 @@ const URL = `${process.env.NEXT_PUBLIC_API_URL}/technologies`;
 const getTechnology = async (id: string): Promise<Technology> => {
   try {
     const response = await fetch(`${URL}/${id}`);
-
+    if (!response.ok) {
+      console.error(`Failed to fetch technology: ${response.status}`);
+      throw new Error(`Error fetching technology with ID ${id}`);
+    }
     return mapTechnology(await response.json());
   } catch (error) {
     console.error('Error fetching technology:', error);
