@@ -56,7 +56,7 @@ export const TechnologyForm = () => {
     const loadingToastId = toast.loading('Processing your technology submission...');
 
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/technologies', values);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/technologies`, values);
       toast.success(`Technology "${values.name}" has been submitted for evaluation!.`, {
         id: loadingToastId,
         description: `ID: ${response.data.id}. We'll guide you through the analysis.`,
