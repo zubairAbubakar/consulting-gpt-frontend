@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import TechnologyInputForm from './components/forms/technology-form';
+import TechnologyForm from './components/forms/technology-form';
+
+console.log('TechnologyForm component loaded', TechnologyForm);
 
 export interface FormData {
   name: string;
@@ -35,7 +37,7 @@ const Index = () => {
             Fill out the form below to generate your comprehensive commercial viability report
           </p>
         </div>
-        <TechnologyInputForm />
+        <TechnologyForm />
       </div>
     </div>
   );

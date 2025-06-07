@@ -55,6 +55,7 @@ interface TechnologyPageProps {
 
 const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
   const { technologyId } = await params;
+
   const [technology, comparisonAxes, relatedPatents, papers] = await Promise.all([
     getTechnology(technologyId),
     getComparisonAxes(technologyId),

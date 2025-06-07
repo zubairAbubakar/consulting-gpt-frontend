@@ -3,6 +3,7 @@ import { Technology } from '@/types/technology';
 
 const URL = `${process.env.NEXT_PUBLIC_API_URL}/technologies`;
 
+console.log('getTechnology action loaded', URL);
 const getTechnology = async (id: string): Promise<Technology> => {
   try {
     const response = await fetch(`${URL}/${id}`);
