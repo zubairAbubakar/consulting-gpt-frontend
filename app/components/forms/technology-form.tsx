@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { number, z } from 'zod';
+import { z } from 'zod';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,16 +22,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Briefcase, Mail, User } from 'lucide-react';
 import { FormData } from '@/app/page';
 import { TechnologySchema } from '@/schemas';
-import { createTechnology } from '@/actions/technology';
 import axios from 'axios';
 import { FormError } from './form-error';
 import { FormSuccess } from './form-success';
 
-interface FormComponentProps {
-  onSubmit: (data: FormData) => void;
-}
+console.log('Card Content component loaded', CardContent);
 
-export const TechnologyForm = () => {
+const TechnologyForm = () => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>(undefined);
