@@ -46,6 +46,11 @@ import { getComparisonAxes } from '@/actions/getComparisonAxes';
 import { getRelatedPatents } from '@/actions/getRelatedPatents';
 import { getRelatedPapers } from '@/actions/getRelatedPapers';
 import { BackToTopButton } from '@/app/components/back-to-top-button';
+import { getMarketAnalysis } from '@/actions/getMarketAnalysis';
+import { MarketAnalysis } from '@/types/market-analysis';
+import { MarketAnalysisDetail } from '../components/MarketAnalysisDetail';
+import { ComparisonAxis } from '@/types/comparison-axis';
+import { RelatedPatent } from '@/types/related-patent';
 
 interface TechnologyPageProps {
   params: {
@@ -56,12 +61,14 @@ interface TechnologyPageProps {
 const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
   const { technologyId } = await params;
 
-  const [technology, comparisonAxes, relatedPatents, papers] = await Promise.all([
-    getTechnology(technologyId),
-    getComparisonAxes(technologyId),
-    getRelatedPatents(technologyId),
-    getRelatedPapers(technologyId),
-  ]);
+  const [technology, comparisonAxes, relatedPatents, papers, marketAnalysisData] =
+    await Promise.all([
+      getTechnology(technologyId),
+      getComparisonAxes(technologyId),
+      getRelatedPatents(technologyId),
+      getRelatedPapers(technologyId),
+      getMarketAnalysis(technologyId),
+    ]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
@@ -75,6 +82,18 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
       return dateString;
     }
   };
+
+  // Pre-process/Group the Market Analysis Data
+  const groupedMarketAnalysis = (marketAnalysisData || []).reduce<
+    // Add null check for marketAnalysisData
+    Record<number, MarketAnalysis[]>
+  >((acc, item) => {
+    if (!acc[item.relatedTechnologyId]) {
+      acc[item.relatedTechnologyId] = [];
+    }
+    acc[item.relatedTechnologyId].push(item);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-6" style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -385,6 +404,74 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
             ) : (
               <p className="text-center text-sm text-gray-500 dark:text-slate-400">
                 No related papers found for this technology.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Section 5: Market Analysis Insights */}
+      <div id="market-analysis">
+        <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
+          <CardHeader className="rounded-t-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-6 text-white">
+            <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
+              <PresentationChartLineIcon className="h-6 w-6" />
+              Market Analysis Insights
+            </CardTitle>
+            <CardDescription className="text-cyan-100">
+              Comparative analysis against related patents.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 p-6">
+            {Object.keys(groupedMarketAnalysis).length > 0 ? (
+              Object.entries(groupedMarketAnalysis).map(([relatedPatentId, analyses]) => {
+                // Find the related patent from your relatedPatents array
+                const relatedPatent = (relatedPatents as RelatedPatent[])?.find(
+                  // Cast to RelatedPatent[]
+                  (patent) => patent.id === parseInt(relatedPatentId)
+                );
+                const relatedPatentTitle = relatedPatent
+                  ? relatedPatent.name || `Related Patent ID: ${relatedPatentId}`
+                  : `Related Patent ID: ${relatedPatentId}`;
+
+                return (
+                  <div
+                    key={relatedPatentId}
+                    className="rounded-lg border border-gray-200 bg-slate-50/70 p-4 shadow-md dark:border-slate-700 dark:bg-slate-800/60"
+                  >
+                    <h3 className="mb-3 text-lg font-semibold text-gray-800 dark:text-slate-100">
+                      Comparative Analysis with Patent: {/* @ts-ignore */}
+                      <span className="text-blue-600 dark:text-blue-400">{relatedPatentTitle}</span>
+                      {relatedPatent?.url && (
+                        <a
+                          href={relatedPatent.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-2 inline-flex items-center text-xs text-blue-500 hover:underline dark:text-blue-400"
+                        >
+                          (View Patent <ExternalLinkIcon className="h-3 w-3" />)
+                        </a>
+                      )}
+                    </h3>
+                    <div className="space-y-4">
+                      {analyses.map((item) => {
+                        const axis = (comparisonAxes as ComparisonAxis[])?.find(
+                          // Cast to ComparisonAxis[]
+                          (ax) => ax.id === item.axisId
+                        );
+                        const axisName = axis?.axisName || `Axis ID: ${item.axisId}`;
+
+                        return (
+                          <MarketAnalysisDetail key={item.id} item={item} axisName={axisName} />
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-center text-sm text-gray-500 dark:text-slate-400">
+                No market analysis data found for this technology.
               </p>
             )}
           </CardContent>
