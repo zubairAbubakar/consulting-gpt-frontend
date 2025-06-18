@@ -11,6 +11,7 @@ import {
   NewspaperIcon, // Changed for Papers
   PresentationChartLineIcon,
   BanknotesIcon,
+  ChartPieIcon,
 } from '@heroicons/react/24/outline';
 
 // Configuration for each navigation item
@@ -28,13 +29,6 @@ const navConfig = [
     sectionId: 'overview', // Corresponds to <div id="overview"> on the technology page
   },
   {
-    name: 'Comparison Axis',
-    id: 'comparison-axes',
-    icon: ScaleIcon,
-    sectionId: 'comparison-axes',
-    originalPageHref: '/technology/comparison', // Fallback if not on a specific technology page
-  },
-  {
     name: 'Patents',
     id: 'patents',
     icon: DocumentMagnifyingGlassIcon,
@@ -49,11 +43,18 @@ const navConfig = [
     originalPageHref: '/technology/research', // Assuming same original base path
   },
   {
+    name: 'Market Analysis',
+    id: 'market-analysis',
+    icon: ChartPieIcon,
+    sectionId: 'market-analysis',
+    originalPageHref: '/technology/market-analysis',
+  },
+  {
     name: 'PCA & Visualization',
-    id: 'visualization',
+    id: 'pca-visualization',
     icon: PresentationChartLineIcon,
-    sectionId: 'visualization',
-    originalPageHref: '/technology/visualization',
+    sectionId: 'pca-visualization',
+    originalPageHref: '/technology/pca-visualization',
   },
   {
     name: 'Billable Items',

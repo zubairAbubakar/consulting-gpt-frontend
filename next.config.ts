@@ -5,3 +5,7 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// module.exports = {
+//   allowedDevOrigins: ['https://zubairabubakar.co', 'http://zubairabubakar.co'],
+// };
