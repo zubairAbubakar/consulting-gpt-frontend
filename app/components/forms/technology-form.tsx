@@ -19,12 +19,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, Mail, User } from 'lucide-react';
+import { Briefcase, Mail, Notebook, User } from 'lucide-react';
 import { FormData } from '@/app/page';
 import { TechnologySchema } from '@/schemas';
 import axios from 'axios';
 import { FormError } from './form-error';
 import { FormSuccess } from './form-success';
+import LightBulbIcon from '@heroicons/react/24/outline/LightBulbIcon';
+import ScaleIcon from '@heroicons/react/24/outline/ScaleIcon';
 
 console.log('Card Content component loaded', CardContent);
 
@@ -104,7 +106,7 @@ const TechnologyForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
-                    <User className="h-4 w-4" />
+                    <LightBulbIcon className="h-4 w-4" />
                     Technology Name
                   </FormLabel>
                   <FormControl>
@@ -126,7 +128,7 @@ const TechnologyForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
-                    <Mail className="h-4 w-4" />
+                    <ScaleIcon className="h-4 w-4" />
                     Number of Axis
                   </FormLabel>
                   <FormControl>
@@ -149,7 +151,7 @@ const TechnologyForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
-                    <Briefcase className="h-4 w-4" />
+                    <Notebook className="h-4 w-4" />
                     Technology Abstract
                   </FormLabel>
                   <FormControl>

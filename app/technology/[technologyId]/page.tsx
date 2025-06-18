@@ -30,6 +30,7 @@ import {
   DocumentMagnifyingGlassIcon,
   PresentationChartLineIcon,
   BanknotesIcon,
+  ChartPieIcon,
 } from '@heroicons/react/24/outline';
 import {
   Table,
@@ -51,6 +52,9 @@ import { MarketAnalysis } from '@/types/market-analysis';
 import { MarketAnalysisDetail } from '../components/MarketAnalysisDetail';
 import { ComparisonAxis } from '@/types/comparison-axis';
 import { RelatedPatent } from '@/types/related-patent';
+import { PcaScatterPlot } from '../components/PcaScatterPlot';
+import { getPcaVisualizationData } from '@/actions/getPcaVisualizationData';
+import { PcaData } from '@/types/pca';
 
 interface TechnologyPageProps {
   params: {
@@ -61,14 +65,21 @@ interface TechnologyPageProps {
 const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
   const { technologyId } = await params;
 
-  const [technology, comparisonAxes, relatedPatents, papers, marketAnalysisData] =
-    await Promise.all([
-      getTechnology(technologyId),
-      getComparisonAxes(technologyId),
-      getRelatedPatents(technologyId),
-      getRelatedPapers(technologyId),
-      getMarketAnalysis(technologyId),
-    ]);
+  const [
+    technology,
+    comparisonAxes,
+    relatedPatents,
+    papers,
+    marketAnalysisData,
+    pcaVisualizationData,
+  ] = await Promise.all([
+    getTechnology(technologyId),
+    getComparisonAxes(technologyId),
+    getRelatedPatents(technologyId),
+    getRelatedPapers(technologyId),
+    getMarketAnalysis(technologyId),
+    getPcaVisualizationData(technologyId),
+  ]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
@@ -415,7 +426,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
         <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
           <CardHeader className="rounded-t-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-6 text-white">
             <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
-              <PresentationChartLineIcon className="h-6 w-6" />
+              <ChartPieIcon className="h-6 w-6" />
               Market Analysis Insights
             </CardTitle>
             <CardDescription className="text-cyan-100">
@@ -477,6 +488,15 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Section 6: PCA Visualization */}
+      <div id="pca-visualization">
+        <PcaScatterPlot
+          visualizationData={pcaVisualizationData}
+          yourTechnologyName={technology?.name}
+        />
+      </div>
+
       <BackToTopButton />
     </div>
   );

@@ -51,10 +51,10 @@ const navConfig = [
   },
   {
     name: 'PCA & Visualization',
-    id: 'visualization',
+    id: 'pca-visualization',
     icon: PresentationChartLineIcon,
-    sectionId: 'visualization',
-    originalPageHref: '/technology/visualization',
+    sectionId: 'pca-visualization',
+    originalPageHref: '/technology/pca-visualization',
   },
   {
     name: 'Billable Items',
