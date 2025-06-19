@@ -1,37 +1,19 @@
 import * as React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 import {
-  ArrowLeft,
-  User,
-  Mail,
-  Briefcase,
-  CheckCircle,
-  Clock,
-  Target,
-  Variable,
   Siren,
   Microscope,
   Diff,
   Notebook,
   Key,
-  ArrowRightLeft,
   ExternalLinkIcon,
   FileTextIcon,
   AwardIcon,
 } from 'lucide-react';
-import {
-  LightBulbIcon,
-  BeakerIcon,
-  ScaleIcon,
-  DocumentMagnifyingGlassIcon,
-  PresentationChartLineIcon,
-  BanknotesIcon,
-  ChartPieIcon,
-} from '@heroicons/react/24/outline';
+import { ScaleIcon, DocumentMagnifyingGlassIcon, ChartPieIcon } from '@heroicons/react/24/outline';
 import {
   Table,
   TableBody,
@@ -54,7 +36,8 @@ import { ComparisonAxis } from '@/types/comparison-axis';
 import { RelatedPatent } from '@/types/related-patent';
 import { PcaScatterPlot } from '../components/PcaScatterPlot';
 import { getPcaVisualizationData } from '@/actions/getPcaVisualizationData';
-import { PcaData } from '@/types/pca';
+import { getMedicalAssessment } from '@/actions/getMedicalAssessment';
+import { MedicalAssessment } from '../components/MedicalAssessment';
 
 interface TechnologyPageProps {
   params: {
@@ -72,6 +55,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
     papers,
     marketAnalysisData,
     pcaVisualizationData,
+    medicalAssessment,
   ] = await Promise.all([
     getTechnology(technologyId),
     getComparisonAxes(technologyId),
@@ -79,6 +63,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
     getRelatedPapers(technologyId),
     getMarketAnalysis(technologyId),
     getPcaVisualizationData(technologyId),
+    getMedicalAssessment(technologyId), 
   ]);
 
   const formatDate = (dateString: string) => {
@@ -497,6 +482,13 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
         />
       </div>
 
+      <div id="billable-items">
+        <MedicalAssessment
+          medicalAssociation={medicalAssessment?.medical_association || 'N/A'}
+          billableItems={medicalAssessment?.billable_items || []}
+          totalFee={medicalAssessment?.totalFee || 0}
+        />
+      </div>
       <BackToTopButton />
     </div>
   );

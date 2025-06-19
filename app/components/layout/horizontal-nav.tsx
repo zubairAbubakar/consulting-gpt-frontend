@@ -58,10 +58,10 @@ const navConfig = [
   },
   {
     name: 'Billable Items',
-    id: 'billing',
+    id: 'billable-items',
     icon: BanknotesIcon,
-    sectionId: 'billing',
-    originalPageHref: '/technology/billing',
+    sectionId: 'billable-items',
+    originalPageHref: '/technology/billable-items',
   },
 ];
 
