@@ -13,7 +13,12 @@ import {
   FileTextIcon,
   AwardIcon,
 } from 'lucide-react';
-import { ScaleIcon, DocumentMagnifyingGlassIcon, ChartPieIcon } from '@heroicons/react/24/outline';
+import {
+  ScaleIcon,
+  DocumentMagnifyingGlassIcon,
+  ChartPieIcon,
+  BanknotesIcon,
+} from '@heroicons/react/24/outline';
 import {
   Table,
   TableBody,
@@ -63,7 +68,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
     getRelatedPapers(technologyId),
     getMarketAnalysis(technologyId),
     getPcaVisualizationData(technologyId),
-    getMedicalAssessment(technologyId), 
+    getMedicalAssessment(technologyId),
   ]);
 
   const formatDate = (dateString: string) => {
@@ -219,19 +224,17 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                 {relatedPatents.map((doc) => (
                   <div
                     key={doc.id}
-                    className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-800/50"
+                    className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 shadow-sm"
                   >
                     <div className="mb-2 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
-                      <h4 className="text-md font-semibold text-gray-800 dark:text-slate-100">
-                        {doc.name || 'N/A'}
-                      </h4>
+                      <h4 className="text-md font-semibold text-gray-800">{doc.name || 'N/A'}</h4>
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge
                           variant="outline"
                           className={`text-xs capitalize ${
                             doc.type === 'patent'
-                              ? 'border-sky-500 text-sky-700 dark:border-sky-400 dark:text-sky-300'
-                              : 'border-amber-500 text-amber-700 dark:border-amber-400 dark:text-amber-300'
+                              ? 'border-sky-500 text-sky-700'
+                              : 'border-amber-500 text-amber-700'
                           }`}
                         >
                           {doc.type || 'N/A'}
@@ -245,17 +248,15 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                     </div>
 
                     {doc.abstract && (
-                      <p className="mb-2 text-sm leading-relaxed text-gray-600 dark:text-slate-300">
-                        <span className="font-medium text-gray-700 dark:text-slate-200">
-                          Abstract:
-                        </span>{' '}
+                      <p className="mb-2 text-sm leading-relaxed text-gray-600">
+                        <span className="font-medium text-gray-700">Abstract:</span>{' '}
                         {doc.abstract.length > 200
                           ? `${doc.abstract.substring(0, 200)}...`
                           : doc.abstract}
                       </p>
                     )}
 
-                    <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-slate-400 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-xs text-gray-500 sm:grid-cols-2">
                       {doc.publicationDate && (
                         <p>
                           <span className="font-medium">Published:</span>{' '}
@@ -284,7 +285,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                           href={doc.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
                         >
                           View Document <ExternalLinkIcon className="h-3 w-3" />
                         </a>
@@ -294,7 +295,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-sm text-gray-500 dark:text-slate-400">
+              <p className="text-center text-sm text-gray-500">
                 No related patents or papers found for this technology.
               </p>
             )}
@@ -323,16 +324,16 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                   ) => (
                     <div
                       key={paper.id} // Assuming 'id' is unique for the paper record
-                      className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-800/50"
+                      className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 shadow-sm"
                     >
                       <div className="mb-2 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
-                        <h4 className="text-md font-semibold text-gray-800 dark:text-slate-100">
-                          {paper.title || 'N/A'} {/* Using paper.title */}
+                        <h4 className="text-md font-semibold text-gray-800">
+                          {paper.title || 'N/A'}
                         </h4>
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge
                             variant="outline"
-                            className="border-amber-500 text-xs capitalize text-amber-700 dark:border-amber-400 dark:text-amber-300"
+                            className="border-amber-500 text-xs capitalize text-amber-700"
                           >
                             Paper
                           </Badge>
@@ -345,17 +346,15 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                       </div>
 
                       {paper.abstract && (
-                        <p className="mb-2 text-sm leading-relaxed text-gray-600 dark:text-slate-300">
-                          <span className="font-medium text-gray-700 dark:text-slate-200">
-                            Abstract:
-                          </span>{' '}
+                        <p className="mb-2 text-sm leading-relaxed text-gray-600">
+                          <span className="font-medium text-gray-700">Abstract:</span>{' '}
                           {paper.abstract.length > 200
                             ? `${paper.abstract.substring(0, 200)}...`
                             : paper.abstract}
                         </p>
                       )}
 
-                      <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-slate-400 sm:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-xs text-gray-500 sm:grid-cols-2">
                         {paper.publicationDate && ( // Using paper.publicationDate
                           <p>
                             <span className="font-medium">Published:</span>{' '}
@@ -375,7 +374,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                         {paper.citationCount !== undefined &&
                           paper.citationCount > 0 && ( // Display citation count
                             <p className="flex items-center gap-1">
-                              <AwardIcon className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-500" />
+                              <AwardIcon className="h-3.5 w-3.5 text-yellow-600" />
                               <span className="font-medium">Citations:</span> {paper.citationCount}
                             </p>
                           )}
@@ -387,7 +386,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                             href={paper.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                            className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
                           >
                             View Paper <ExternalLinkIcon className="h-3 w-3" />
                           </a>
@@ -398,7 +397,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                 )}
               </div>
             ) : (
-              <p className="text-center text-sm text-gray-500 dark:text-slate-400">
+              <p className="text-center text-sm text-gray-500">
                 No related papers found for this technology.
               </p>
             )}
@@ -433,17 +432,17 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                 return (
                   <div
                     key={relatedPatentId}
-                    className="rounded-lg border border-gray-200 bg-slate-50/70 p-4 shadow-md dark:border-slate-700 dark:bg-slate-800/60"
+                    className="rounded-lg border border-gray-200 bg-slate-50/70 p-4 shadow-md"
                   >
-                    <h3 className="mb-3 text-lg font-semibold text-gray-800 dark:text-slate-100">
+                    <h3 className="mb-3 text-lg font-semibold text-gray-800">
                       Comparative Analysis with Patent: {/* @ts-ignore */}
-                      <span className="text-blue-600 dark:text-blue-400">{relatedPatentTitle}</span>
+                      <span className="text-blue-600">{relatedPatentTitle}</span>
                       {relatedPatent?.url && (
                         <a
                           href={relatedPatent.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="ml-2 inline-flex items-center text-xs text-blue-500 hover:underline dark:text-blue-400"
+                          className="ml-2 inline-flex items-center text-xs text-blue-500 hover:underline"
                         >
                           (View Patent <ExternalLinkIcon className="h-3 w-3" />)
                         </a>
@@ -466,7 +465,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
                 );
               })
             ) : (
-              <p className="text-center text-sm text-gray-500 dark:text-slate-400">
+              <p className="text-center text-sm text-gray-500">
                 No market analysis data found for this technology.
               </p>
             )}
@@ -482,12 +481,28 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
         />
       </div>
 
-      <div id="billable-items">
-        <MedicalAssessment
-          medicalAssociation={medicalAssessment?.medical_association || 'N/A'}
-          billableItems={medicalAssessment?.billable_items || []}
-          totalFee={medicalAssessment?.totalFee || 0}
-        />
+      <div id="medical-assessment">
+        <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
+          <CardHeader className="rounded-t-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-6 text-white">
+            <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
+              <BanknotesIcon className="h-5 w-5" />
+              Medical Assessment & Billable Items
+            </CardTitle>
+            <CardDescription className="text-emerald-100">
+              Medical assessment and associated billable items
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <MedicalAssessment
+              medicalAssociation={medicalAssessment?.medical_association || 'N/A'}
+              recommendations={
+                medicalAssessment?.recommendations || 'No recommendations available.'
+              }
+              billableItems={medicalAssessment?.billable_items || []}
+              totalFee={medicalAssessment?.total_fee || 0}
+            />
+          </CardContent>
+        </Card>
       </div>
       <BackToTopButton />
     </div>

@@ -7,6 +7,7 @@ export interface BillableItem {
 
 export interface MedicalAssessment {
   medical_association: string;
+  recommendations: string;
   billable_items: BillableItem[];
-  totalFee: number;
+  total_fee: number;
 }

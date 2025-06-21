@@ -146,7 +146,7 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-sm text-gray-500 dark:text-slate-400">
+          <p className="text-center text-sm text-gray-500">
             PCA data, PCA view, or points data is not available.
           </p>
         </CardContent>
@@ -371,9 +371,7 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
         {/* --- CLUSTER SECTION MOVED HERE --- */}
         {clusters.length > 0 && (
           <div className="mt-4">
-            <h4 className="text-md mb-2 font-semibold text-gray-800 dark:text-slate-200">
-              Technology Clusters:
-            </h4>
+            <h4 className="text-md mb-2 font-semibold text-gray-800">Technology Clusters:</h4>
             <div className="space-y-2">
               {clusters.map((cluster) => {
                 // Sort members by distance to center, show top 3
@@ -384,8 +382,8 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
                   <div
                     key={cluster.id}
                     className={`rounded border p-3 transition-all duration-150 ease-in-out hover:shadow-md
-                      ${cluster.id === activeClusterId ? 'border-teal-500 bg-teal-50 shadow-lg dark:border-teal-700 dark:bg-teal-900/30' : 'border-gray-200 bg-white dark:border-slate-700 dark:bg-slate-800/50'}
-                      ${cluster.contains_target ? 'ring-2 ring-pink-500 ring-offset-1 ring-offset-background dark:ring-offset-slate-900' : ''}`}
+                      ${cluster.id === activeClusterId ? 'border-teal-500 bg-teal-50 shadow-lg' : 'border-gray-200 bg-white'}
+                      ${cluster.contains_target ? 'ring-2 ring-pink-500 ring-offset-1 ring-offset-background' : ''}`}
                     onMouseEnter={() => setHoveredClusterId(cluster.id)}
                     onMouseLeave={() => setHoveredClusterId(null)}
                     // onClick={() =>
@@ -393,15 +391,15 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
                     // }
                     style={{ cursor: 'pointer' }}
                   >
-                    <h5 className="font-semibold text-gray-700 dark:text-slate-200">
+                    <h5 className="font-semibold text-gray-700">
                       {cluster.name}
                       {cluster.contains_target && (
-                        <span className="ml-2 text-xs font-normal text-pink-600 dark:text-pink-400">
+                        <span className="ml-2 text-xs font-normal text-pink-600">
                           (Contains Your Technology)
                         </span>
                       )}
                     </h5>
-                    <div className="text-xs text-gray-500 dark:text-slate-400">
+                    <div className="text-xs text-gray-500">
                       <div>
                         <span className="font-medium">Center:</span> ({cluster.center[0].toFixed(2)}
                         , {cluster.center[1].toFixed(2)}) &nbsp;|&nbsp;
@@ -418,7 +416,7 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
                 );
               })}
             </div>
-            <div className="mt-1 text-xs text-gray-400 dark:text-slate-500">
+            <div className="mt-1 text-xs text-gray-400">
               <span>
                 <b>Tip:</b> Hover to preview, click to persistently highlight a cluster. Click again
                 to deselect.
@@ -427,17 +425,13 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
           </div>
         )}
 
-        <div className="mt-6 space-y-4 text-sm text-gray-700 dark:text-slate-300">
+        <div className="mt-6 space-y-4 text-sm text-gray-700">
           <div>
-            <h4 className="text-md mb-1 font-semibold text-gray-800 dark:text-slate-200">
-              Interpreting the Axes:
-            </h4>
+            <h4 className="text-md mb-1 font-semibold text-gray-800">Interpreting the Axes:</h4>
             <div>
-              <strong className="block text-gray-700 dark:text-slate-200">
-                Principal Component 1 (X-axis):
-              </strong>
-              <p className="text-xs text-gray-600 dark:text-slate-400">{pc1Interpretation}</p>
-              <ul className="mt-1 list-inside list-disc pl-4 text-xs text-gray-500 dark:text-slate-500">
+              <strong className="block text-gray-700">Principal Component 1 (X-axis):</strong>
+              <p className="text-xs text-gray-600">{pc1Interpretation}</p>
+              <ul className="mt-1 list-inside list-disc pl-4 text-xs text-gray-500">
                 {topPc1Loadings.map((l) => (
                   <li key={`pc1-${l.axis}`}>
                     {l.axis}: {l.value.toFixed(3)}
@@ -446,11 +440,9 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
               </ul>
             </div>
             <div className="mt-2">
-              <strong className="block text-gray-700 dark:text-slate-200">
-                Principal Component 2 (Y-axis):
-              </strong>
-              <p className="text-xs text-gray-600 dark:text-slate-400">{pc2Interpretation}</p>
-              <ul className="mt-1 list-inside list-disc pl-4 text-xs text-gray-500 dark:text-slate-500">
+              <strong className="block text-gray-700">Principal Component 2 (Y-axis):</strong>
+              <p className="text-xs text-gray-600">{pc2Interpretation}</p>
+              <ul className="mt-1 list-inside list-disc pl-4 text-xs text-gray-500">
                 {topPc2Loadings.map((l) => (
                   <li key={`pc2-${l.axis}`}>
                     {l.axis}: {l.value.toFixed(3)}
@@ -461,48 +453,40 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
           </div>
 
           <div>
-            <h4 className="text-md mb-1 font-semibold text-gray-800 dark:text-slate-200">
+            <h4 className="text-md mb-1 font-semibold text-gray-800">
               Understanding the Quadrants:
             </h4>
             <div className="grid grid-cols-1 gap-2 text-xs md:grid-cols-2">
-              <div className="rounded border border-gray-200 p-2 dark:border-slate-700">
-                <strong className="block text-gray-700 dark:text-slate-200">
-                  Top-Right (High PC1, High PC2):
-                </strong>
-                <p className="text-gray-600 dark:text-slate-400">
+              <div className="rounded border border-gray-200 p-2">
+                <strong className="block text-gray-700">Top-Right (High PC1, High PC2):</strong>
+                <p className="text-gray-600">
                   Technologies here tend to exhibit characteristics associated with the positive
                   ends of both PC1 and PC2.
                 </p>
               </div>
-              <div className="rounded border border-gray-200 p-2 dark:border-slate-700">
-                <strong className="block text-gray-700 dark:text-slate-200">
-                  Top-Left (Low PC1, High PC2):
-                </strong>
-                <p className="text-gray-600 dark:text-slate-400">
+              <div className="rounded border border-gray-200 p-2">
+                <strong className="block text-gray-700 ">Top-Left (Low PC1, High PC2):</strong>
+                <p className="text-gray-600">
                   Technologies here tend to exhibit characteristics associated with the negative end
                   of PC1 and the positive end of PC2.
                 </p>
               </div>
-              <div className="rounded border border-gray-200 p-2 dark:border-slate-700">
-                <strong className="block text-gray-700 dark:text-slate-200">
-                  Bottom-Left (Low PC1, Low PC2):
-                </strong>
-                <p className="text-gray-600 dark:text-slate-400">
+              <div className="rounded border border-gray-200 p-2">
+                <strong className="block text-gray-700">Bottom-Left (Low PC1, Low PC2):</strong>
+                <p className="text-gray-600">
                   Technologies here tend to exhibit characteristics associated with the negative
                   ends of both PC1 and PC2.
                 </p>
               </div>
-              <div className="rounded border border-gray-200 p-2 dark:border-slate-700">
-                <strong className="block text-gray-700 dark:text-slate-200">
-                  Bottom-Right (High PC1, Low PC2):
-                </strong>
-                <p className="text-gray-600 dark:text-slate-400">
+              <div className="rounded border border-gray-200 p-2">
+                <strong className="block text-gray-700">Bottom-Right (High PC1, Low PC2):</strong>
+                <p className="text-gray-600">
                   Technologies here tend to exhibit characteristics associated with the positive end
                   of PC1 and the negative end of PC2.
                 </p>
               </div>
             </div>
-            <p className="mt-2 text-xs text-gray-500 dark:text-slate-500">
+            <p className="mt-2 text-xs text-gray-500">
               Refer to the "Interpreting the Axes" section above to understand what high/low PC1 and
               PC2 values signify based on the data.
             </p>
