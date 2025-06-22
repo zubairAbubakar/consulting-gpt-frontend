@@ -18,6 +18,7 @@ import {
   DocumentMagnifyingGlassIcon,
   ChartPieIcon,
   BanknotesIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
 import {
   Table,
@@ -43,6 +44,7 @@ import { PcaScatterPlot } from '../components/PcaScatterPlot';
 import { getPcaVisualizationData } from '@/actions/getPcaVisualizationData';
 import { getMedicalAssessment } from '@/actions/getMedicalAssessment';
 import { MedicalAssessment } from '../components/MedicalAssessment';
+import { Button } from '@/components/ui/button';
 
 interface TechnologyPageProps {
   params: {
@@ -98,8 +100,19 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
 
   return (
     <div className="space-y-6" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div className="mb-6 flex items-center gap-4">
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-800">Technology Analysis Report</h2>
+
+        {/* The new download button */}
+        <Button asChild variant="outline" size="sm">
+          <a
+            href="/path/to/your/report.pdf" // Replace with the actual path to the PDF
+            download="Technology-Analysis-Report.pdf" // This sets the default filename for the user
+          >
+            <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+            Download PDF
+          </a>
+        </Button>
       </div>
       {/* Section 1: Technology Overview */}
       <div id="overview">

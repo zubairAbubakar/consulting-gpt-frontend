@@ -47,7 +47,7 @@ export const MedicalAssessment: React.FC<MedicalAssessmentProps> = ({
       </div>
       <div className="mb-4 mt-8 flex flex-col md:flex-row md:items-center md:justify-between">
         <h2 className="text-xl font-semibold text-gray-800">
-          Billable Items based on medical Association: {medicalAssociation}
+          Billable items based on identified medical Association: {medicalAssociation}
         </h2>
       </div>
       <div className="overflow-x-auto rounded shadow">
