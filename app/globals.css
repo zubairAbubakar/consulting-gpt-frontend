@@ -62,6 +62,11 @@
     --sidebar-ring: 216 12.2% 83.9%;
   }
 
+  /* Hide elements with this class when the PDF is being generated */
+  .pdf-capturing .hide-from-pdf {
+    display: none !important;
+  }
+
   body {
     /* Use standard CSS properties instead of @apply to avoid build errors */
     background-color: hsl(var(--background));
