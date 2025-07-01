@@ -45,11 +45,13 @@ import { getMedicalAssessment } from '@/actions/getMedicalAssessment';
 import { MedicalAssessment } from '../components/MedicalAssessment';
 import { Button } from '@/components/ui/button';
 import { ReportDownloader } from '../components/ReportDownloader';
+import getAnalysisStatus from '@/actions/getAnalysisStatus';
+import { ProgressIndicator } from '../components/ProgressIndicator';
 
 interface TechnologyPageProps {
-  params: {
+  params: Promise<{
     technologyId: string;
-  };
+  }>;
 }
 
 const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
@@ -63,6 +65,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
     marketAnalysisData,
     pcaVisualizationData,
     medicalAssessment,
+    analysisStatus,
   ] = await Promise.all([
     getTechnology(technologyId),
     getComparisonAxes(technologyId),
@@ -71,6 +74,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
     getMarketAnalysis(technologyId),
     getPcaVisualizationData(technologyId),
     getMedicalAssessment(technologyId),
+    getAnalysisStatus(technologyId),
   ]);
 
   const formatDate = (dateString: string) => {
@@ -102,6 +106,13 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
     <div className="container mx-auto p-4 px-4">
       <ReportDownloader reportName="Medical-Technology-Analysis-Report.pdf">
         <div className="space-y-6" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          {/* Progress Indicator */}
+          <ProgressIndicator
+            analysisStatus={analysisStatus}
+            isLoading={false}
+            technologyId={technologyId}
+          />
+
           {/* Section 1: Technology Overview */}
           <div id="overview">
             <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
