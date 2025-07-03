@@ -1,33 +1,12 @@
+'use client';
+
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
-import {
-  Siren,
-  Microscope,
-  Diff,
-  Notebook,
-  Key,
-  ExternalLinkIcon,
-  FileTextIcon,
-  AwardIcon,
-} from 'lucide-react';
-import {
-  ScaleIcon,
-  DocumentMagnifyingGlassIcon,
-  ChartPieIcon,
-  BanknotesIcon,
-} from '@heroicons/react/24/outline';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Siren, Microscope, Diff, Notebook, Key } from 'lucide-react';
 
 import getTechnology from '@/actions/getTechnology';
 import { getComparisonAxes } from '@/actions/getComparisonAxes';
@@ -36,17 +15,22 @@ import { getRelatedPapers } from '@/actions/getRelatedPapers';
 import { BackToTopButton } from '@/app/components/back-to-top-button';
 import { getMarketAnalysis } from '@/actions/getMarketAnalysis';
 import { MarketAnalysis } from '@/types/market-analysis';
-import { MarketAnalysisDetail } from '../components/MarketAnalysisDetail';
 import { ComparisonAxis } from '@/types/comparison-axis';
 import { RelatedPatent } from '@/types/related-patent';
-import { PcaScatterPlot } from '../components/PcaScatterPlot';
 import { getPcaVisualizationData } from '@/actions/getPcaVisualizationData';
 import { getMedicalAssessment } from '@/actions/getMedicalAssessment';
-import { MedicalAssessment } from '../components/MedicalAssessment';
 import { Button } from '@/components/ui/button';
 import { ReportDownloader } from '../components/ReportDownloader';
 import getAnalysisStatus from '@/actions/getAnalysisStatus';
 import { ProgressIndicator } from '../components/ProgressIndicator';
+import { SectionSkeleton } from '../components/SectionSkeleton';
+import { useAnalysisStatus } from '../hooks/useAnalysisStatus';
+import { ComparisonAxesSection } from '../components/ComparisonAxesSection';
+import { RelatedPatentsSection } from '../components/RelatedPapersSection';
+import { RelatedPapersSection } from '../components/RelatedPapersSectionModular';
+import { MarketAnalysisSection } from '../components/MarketAnalysisSection';
+import { PcaVisualizationSection } from '../components/PcaVisualizationSection';
+import { MedicalAssessmentSection } from '../components/MedicalAssessmentSection';
 
 interface TechnologyPageProps {
   params: Promise<{
@@ -54,28 +38,139 @@ interface TechnologyPageProps {
   }>;
 }
 
-const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
-  const { technologyId } = await params;
+const TechnologyPage: React.FC<TechnologyPageProps> = ({ params }) => {
+  // State for the technology ID
+  const [technologyId, setTechnologyId] = useState<string>('');
 
-  const [
-    technology,
-    comparisonAxes,
-    relatedPatents,
-    papers,
-    marketAnalysisData,
-    pcaVisualizationData,
-    medicalAssessment,
+  // State for data
+  const [technology, setTechnology] = useState<any>(null);
+  const [comparisonAxes, setComparisonAxes] = useState<ComparisonAxis[]>([]);
+  const [relatedPatents, setRelatedPatents] = useState<RelatedPatent[]>([]);
+  const [papers, setPapers] = useState<any[]>([]);
+  const [marketAnalysisData, setMarketAnalysisData] = useState<MarketAnalysis[]>([]);
+  const [pcaVisualizationData, setPcaVisualizationData] = useState<any>(null);
+  const [medicalAssessment, setMedicalAssessment] = useState<any>(null);
+
+  // Track which components have been loaded
+  const [loadedComponents, setLoadedComponents] = useState<Set<string>>(new Set());
+
+  // Initialize params
+  useEffect(() => {
+    const initializeParams = async () => {
+      const resolvedParams = await params;
+      setTechnologyId(resolvedParams.technologyId);
+    };
+    initializeParams();
+  }, [params]);
+
+  // Use analysis status hook for real-time updates
+  const {
     analysisStatus,
-  ] = await Promise.all([
-    getTechnology(technologyId),
-    getComparisonAxes(technologyId),
-    getRelatedPatents(technologyId),
-    getRelatedPapers(technologyId),
-    getMarketAnalysis(technologyId),
-    getPcaVisualizationData(technologyId),
-    getMedicalAssessment(technologyId),
-    getAnalysisStatus(technologyId),
-  ]);
+    isLoading: statusLoading,
+    refetch,
+    isPolling,
+  } = useAnalysisStatus({
+    technologyId,
+    enabled: !!technologyId,
+  });
+
+  // Load basic technology information immediately (always available)
+  useEffect(() => {
+    if (!technologyId) return;
+
+    const loadTechnology = async () => {
+      try {
+        const tech = await getTechnology(technologyId);
+        setTechnology(tech);
+      } catch (error) {
+        console.error('Error loading technology:', error);
+      }
+    };
+
+    loadTechnology();
+  }, [technologyId]);
+
+  // Progressive data loading based on analysis status
+  useEffect(() => {
+    if (!analysisStatus || !technologyId) return;
+
+    const { components } = analysisStatus;
+
+    // Load comparison axes when complete
+    if (
+      components.comparisonAxes?.status === 'complete' &&
+      !loadedComponents.has('comparisonAxes')
+    ) {
+      getComparisonAxes(technologyId)
+        .then((data) => {
+          setComparisonAxes(data);
+          setLoadedComponents((prev) => new Set(prev).add('comparisonAxes'));
+        })
+        .catch(console.error);
+    }
+
+    // Load related patents when complete
+    if (
+      components.relatedPatents?.status === 'complete' &&
+      !loadedComponents.has('relatedPatents')
+    ) {
+      getRelatedPatents(technologyId)
+        .then((data) => {
+          setRelatedPatents(data);
+          setLoadedComponents((prev) => new Set(prev).add('relatedPatents'));
+        })
+        .catch(console.error);
+    }
+
+    // Load related papers when complete
+    if (components.relatedPapers?.status === 'complete' && !loadedComponents.has('relatedPapers')) {
+      getRelatedPapers(technologyId)
+        .then((data) => {
+          setPapers(data);
+          setLoadedComponents((prev) => new Set(prev).add('relatedPapers'));
+        })
+        .catch(console.error);
+    }
+
+    // Load market analysis when complete
+    if (
+      components.marketAnalysis?.status === 'complete' &&
+      !loadedComponents.has('marketAnalysis')
+    ) {
+      getMarketAnalysis(technologyId)
+        .then((data) => {
+          setMarketAnalysisData(data);
+          setLoadedComponents((prev) => new Set(prev).add('marketAnalysis'));
+        })
+        .catch(console.error);
+    }
+
+    // Load PCA visualization when complete
+    if (
+      components.pcaVisualization?.status === 'complete' &&
+      !loadedComponents.has('pcaVisualization')
+    ) {
+      getPcaVisualizationData(technologyId)
+        .then((data) => {
+          setPcaVisualizationData(data);
+          setLoadedComponents((prev) => new Set(prev).add('pcaVisualization'));
+        })
+        .catch(console.error);
+    }
+
+    // Load medical assessment when complete
+    if (
+      components.medicalAssessment?.status === 'complete' &&
+      !loadedComponents.has('medicalAssessment')
+    ) {
+      getMedicalAssessment(technologyId)
+        .then((data) => {
+          setMedicalAssessment(data);
+          setLoadedComponents((prev) => new Set(prev).add('medicalAssessment'));
+        })
+        .catch(console.error);
+    }
+  }, [analysisStatus, technologyId, loadedComponents]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
@@ -90,17 +185,22 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
     }
   };
 
-  // Pre-process/Group the Market Analysis Data
-  const groupedMarketAnalysis = (marketAnalysisData || []).reduce<
-    // Add null check for marketAnalysisData
-    Record<number, MarketAnalysis[]>
-  >((acc, item) => {
-    if (!acc[item.relatedTechnologyId]) {
-      acc[item.relatedTechnologyId] = [];
-    }
-    acc[item.relatedTechnologyId].push(item);
-    return acc;
-  }, {});
+  // Show loading state if technology data is not loaded yet
+  if (!technology) {
+    return (
+      <div className="container mx-auto p-4 px-4">
+        <div className="space-y-6" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <ProgressIndicator
+            analysisStatus={analysisStatus}
+            isLoading={statusLoading}
+            technologyId={technologyId}
+            isPolling={isPolling}
+            onRefresh={refetch}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4 px-4">
@@ -109,11 +209,12 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
           {/* Progress Indicator */}
           <ProgressIndicator
             analysisStatus={analysisStatus}
-            isLoading={false}
+            isLoading={statusLoading}
             technologyId={technologyId}
+            isPolling={isPolling}
+            onRefresh={refetch}
           />
-
-          {/* Section 1: Technology Overview */}
+          {/* Technology Overview - Always show since it's immediately available */}
           <div id="overview">
             <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
               <CardHeader className="rounded-t-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-6 text-white">
@@ -178,349 +279,49 @@ const TechnologyPage: React.FC<TechnologyPageProps> = async ({ params }) => {
             </div> */}
               </CardContent>
             </Card>
-          </div>
-
-          {/* Section 2: Comparison Axis */}
-          <div id="comparison-axes">
-            <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
-              <CardHeader className="rounded-t-lg bg-gradient-to-r from-green-500 to-teal-600 px-6 py-6 text-white">
-                <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
-                  <ScaleIcon className="h-5 w-5" />
-                  Comparison Axes
-                </CardTitle>
-                <CardDescription className="text-green-100">
-                  Detailed analysis of comparison axes
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <Table>
-                  <TableCaption>Comparison axes for the technology: {technology.name}</TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Axis Name</TableHead>
-                      <TableHead>Extreme 1</TableHead>
-                      <TableHead>Extreme 2</TableHead>
-                      <TableHead>Weight</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {comparisonAxes.map((axis) => (
-                      <TableRow key={axis.id}>
-                        <TableCell>{axis.axisName}</TableCell>
-                        <TableCell>{axis.extreme1}</TableCell>
-                        <TableCell>{axis.extreme2}</TableCell>
-                        <TableCell>{axis.weight}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
-
+          </div>{' '}
+          {/* Comparison Axes Section */}
+          <ComparisonAxesSection
+            analysisStatus={analysisStatus}
+            comparisonAxes={comparisonAxes}
+            technologyName={technology?.name}
+            isLoaded={loadedComponents.has('comparisonAxes')}
+          />
           {/* Section 3: Related Patents */}
-          <div id="patents">
-            <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
-              <CardHeader className="rounded-t-lg bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-4 text-white">
-                {/* Adjusted py-6 to py-4 */}
-                <CardTitle className="flex items-center gap-2 text-xl font-semibold">
-                  {/* Adjusted text-2xl to text-xl */}
-                  <DocumentMagnifyingGlassIcon className="h-5 w-5" /> {/* Heroicon */}
-                  Related Patents & Papers
-                </CardTitle>
-                <CardDescription className="text-purple-100">
-                  Some related patents to your technology
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 p-6">
-                {relatedPatents && relatedPatents.length > 0 ? (
-                  <div className="space-y-5">
-                    {relatedPatents.map((doc) => (
-                      <div
-                        key={doc.id}
-                        className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 shadow-sm"
-                      >
-                        <div className="mb-2 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
-                          <h4 className="text-md font-semibold text-gray-800">
-                            {doc.name || 'N/A'}
-                          </h4>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Badge
-                              variant="outline"
-                              className={`text-xs capitalize ${
-                                doc.type === 'patent'
-                                  ? 'border-sky-500 text-sky-700'
-                                  : 'border-amber-500 text-amber-700'
-                              }`}
-                            >
-                              {doc.type || 'N/A'}
-                            </Badge>
-                            {doc.documentId && (
-                              <Badge variant="secondary" className="text-xs">
-                                ID: {doc.documentId}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-
-                        {doc.abstract && (
-                          <p className="mb-2 text-sm leading-relaxed text-gray-600">
-                            <span className="font-medium text-gray-700">Abstract:</span>{' '}
-                            {doc.abstract.length > 200
-                              ? `${doc.abstract.substring(0, 200)}...`
-                              : doc.abstract}
-                          </p>
-                        )}
-
-                        <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-xs text-gray-500 sm:grid-cols-2">
-                          {doc.publicationDate && (
-                            <p>
-                              <span className="font-medium">Published:</span>{' '}
-                              {formatDate(doc.publicationDate)}
-                            </p>
-                          )}
-                          {doc.inventors && (
-                            <p className="truncate">
-                              {' '}
-                              {/* Added truncate for potentially long lists */}
-                              <span className="font-medium">Inventors:</span> {doc.inventors}
-                            </p>
-                          )}
-                          {doc.assignees && (
-                            <p className="truncate">
-                              {' '}
-                              {/* Added truncate */}
-                              <span className="font-medium">Assignees:</span> {doc.assignees}
-                            </p>
-                          )}
-                        </div>
-
-                        {doc.url && (
-                          <div className="mt-3">
-                            <a
-                              href={doc.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
-                            >
-                              View Document <ExternalLinkIcon className="h-3 w-3" />
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-sm text-gray-500">
-                    No related patents or papers found for this technology.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
+          <RelatedPatentsSection
+            analysisStatus={analysisStatus}
+            relatedPatents={relatedPatents}
+            isLoaded={loadedComponents.has('relatedPatents')}
+            formatDate={formatDate}
+          />
           {/* Section 4: Related Papers */}
-          <div id="papers">
-            <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
-              <CardHeader className="rounded-t-lg bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-4 text-white">
-                <CardTitle className="flex items-center gap-2 text-xl font-semibold">
-                  <FileTextIcon className="h-5 w-5" />
-                  Related Papers
-                </CardTitle>
-                <CardDescription className="text-amber-100">
-                  Review relevant academic papers and research
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4 p-6">
-                {papers && papers.length > 0 ? (
-                  <div className="space-y-5">
-                    {papers.map(
-                      (
-                        paper // Using RelatedPaper type
-                      ) => (
-                        <div
-                          key={paper.id} // Assuming 'id' is unique for the paper record
-                          className="rounded-lg border border-gray-200 bg-gray-50/60 p-4 shadow-sm"
-                        >
-                          <div className="mb-2 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
-                            <h4 className="text-md font-semibold text-gray-800">
-                              {paper.title || 'N/A'}
-                            </h4>
-                            <div className="flex flex-wrap items-center gap-2">
-                              <Badge
-                                variant="outline"
-                                className="border-amber-500 text-xs capitalize text-amber-700"
-                              >
-                                Paper
-                              </Badge>
-                              {paper.paperId && ( // Using paper.paperId
-                                <Badge variant="secondary" className="text-xs">
-                                  ID: {paper.paperId}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-
-                          {paper.abstract && (
-                            <p className="mb-2 text-sm leading-relaxed text-gray-600">
-                              <span className="font-medium text-gray-700">Abstract:</span>{' '}
-                              {paper.abstract.length > 200
-                                ? `${paper.abstract.substring(0, 200)}...`
-                                : paper.abstract}
-                            </p>
-                          )}
-
-                          <div className="grid grid-cols-1 gap-x-4 gap-y-1 text-xs text-gray-500 sm:grid-cols-2">
-                            {paper.publicationDate && ( // Using paper.publicationDate
-                              <p>
-                                <span className="font-medium">Published:</span>{' '}
-                                {formatDate(paper.publicationDate)}
-                              </p>
-                            )}
-                            {paper.authors && (
-                              <p className="truncate">
-                                <span className="font-medium">Authors:</span> {paper.authors}
-                              </p>
-                            )}
-                            {paper.journal && (
-                              <p className="truncate">
-                                <span className="font-medium">Journal:</span> {paper.journal}
-                              </p>
-                            )}
-                            {paper.citationCount !== undefined &&
-                              paper.citationCount > 0 && ( // Display citation count
-                                <p className="flex items-center gap-1">
-                                  <AwardIcon className="h-3.5 w-3.5 text-yellow-600" />
-                                  <span className="font-medium">Citations:</span>{' '}
-                                  {paper.citationCount}
-                                </p>
-                              )}
-                          </div>
-
-                          {paper.url && (
-                            <div className="mt-3">
-                              <a
-                                href={paper.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
-                              >
-                                View Paper <ExternalLinkIcon className="h-3 w-3" />
-                              </a>
-                            </div>
-                          )}
-                        </div>
-                      )
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-center text-sm text-gray-500">
-                    No related papers found for this technology.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
+          <RelatedPapersSection
+            analysisStatus={analysisStatus}
+            papers={papers}
+            isLoaded={loadedComponents.has('relatedPapers')}
+            formatDate={formatDate}
+          />
           {/* Section 5: Market Analysis Insights */}
-          <div id="market-analysis">
-            <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
-              <CardHeader className="rounded-t-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-6 text-white">
-                <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
-                  <ChartPieIcon className="h-6 w-6" />
-                  Market Analysis Insights
-                </CardTitle>
-                <CardDescription className="text-cyan-100">
-                  Comparative analysis against related patents.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6 p-6">
-                {Object.keys(groupedMarketAnalysis).length > 0 ? (
-                  Object.entries(groupedMarketAnalysis).map(([relatedPatentId, analyses]) => {
-                    // Find the related patent from your relatedPatents array
-                    const relatedPatent = (relatedPatents as RelatedPatent[])?.find(
-                      // Cast to RelatedPatent[]
-                      (patent) => patent.id === parseInt(relatedPatentId)
-                    );
-                    const relatedPatentTitle = relatedPatent
-                      ? relatedPatent.name || `Related Patent ID: ${relatedPatentId}`
-                      : `Related Patent ID: ${relatedPatentId}`;
-
-                    return (
-                      <div
-                        key={relatedPatentId}
-                        className="rounded-lg border border-gray-200 bg-slate-50/70 p-4 shadow-md"
-                      >
-                        <h3 className="mb-3 text-lg font-semibold text-gray-800">
-                          Comparative Analysis with Patent: {/* @ts-ignore */}
-                          <span className="text-blue-600">{relatedPatentTitle}</span>
-                          {relatedPatent?.url && (
-                            <a
-                              href={relatedPatent.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="ml-2 inline-flex items-center text-xs text-blue-500 hover:underline"
-                            >
-                              (View Patent <ExternalLinkIcon className="h-3 w-3" />)
-                            </a>
-                          )}
-                        </h3>
-                        <div className="space-y-4">
-                          {analyses.map((item) => {
-                            const axis = (comparisonAxes as ComparisonAxis[])?.find(
-                              // Cast to ComparisonAxis[]
-                              (ax) => ax.id === item.axisId
-                            );
-                            const axisName = axis?.axisName || `Axis ID: ${item.axisId}`;
-
-                            return (
-                              <MarketAnalysisDetail key={item.id} item={item} axisName={axisName} />
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-center text-sm text-gray-500">
-                    No market analysis data found for this technology.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
+          <MarketAnalysisSection
+            analysisStatus={analysisStatus}
+            marketAnalysisData={marketAnalysisData}
+            comparisonAxes={comparisonAxes}
+            relatedPatents={relatedPatents}
+            isLoaded={loadedComponents.has('marketAnalysis')}
+          />
           {/* Section 6: PCA Visualization */}
-          <div id="pca-visualization">
-            <PcaScatterPlot
-              visualizationData={pcaVisualizationData}
-              yourTechnologyName={technology?.name}
-            />
-          </div>
-
-          <div id="medical-assessment">
-            <Card className="border-0 bg-white/90 py-0 shadow-lg backdrop-blur-sm">
-              <CardHeader className="rounded-t-lg bg-gradient-to-r from-emerald-500 to-teal-600 px-6 py-6 text-white">
-                <CardTitle className="flex items-center gap-2 text-2xl font-semibold">
-                  <BanknotesIcon className="h-5 w-5" />
-                  Medical Assessment & Billable Items
-                </CardTitle>
-                <CardDescription className="text-emerald-100">
-                  Medical assessment and associated billable items
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-6">
-                <MedicalAssessment
-                  medicalAssociation={medicalAssessment?.medical_association || 'N/A'}
-                  recommendations={
-                    medicalAssessment?.recommendations || 'No recommendations available.'
-                  }
-                  billableItems={medicalAssessment?.billable_items || []}
-                  totalFee={medicalAssessment?.total_fee || 0}
-                />
-              </CardContent>
-            </Card>
-          </div>
+          <PcaVisualizationSection
+            analysisStatus={analysisStatus}
+            pcaVisualizationData={pcaVisualizationData}
+            technologyName={technology?.name}
+            isLoaded={loadedComponents.has('pcaVisualization')}
+          />
+          {/* Section 7: Medical Assessment */}
+          <MedicalAssessmentSection
+            analysisStatus={analysisStatus}
+            medicalAssessment={medicalAssessment}
+            isLoaded={loadedComponents.has('medicalAssessment')}
+          />
           <BackToTopButton />
         </div>
       </ReportDownloader>

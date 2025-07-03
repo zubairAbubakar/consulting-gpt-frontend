@@ -7,12 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Clock, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import { AnalysisStatusResponse } from '@/actions/getAnalysisStatus';
-import getAnalysisStatus from '@/actions/getAnalysisStatus';
 
 interface ProgressIndicatorProps {
   analysisStatus: AnalysisStatusResponse | null;
   isLoading: boolean;
   technologyId?: string;
+  isPolling?: boolean;
+  onRefresh?: () => void;
 }
 
 const componentDisplayNames: Record<string, string> = {
@@ -52,59 +53,25 @@ const getStatusColor = (status: string) => {
 };
 
 export function ProgressIndicator({
-  analysisStatus: initialStatus,
-  isLoading: initialLoading,
+  analysisStatus,
+  isLoading,
   technologyId,
+  isPolling = false,
+  onRefresh,
 }: ProgressIndicatorProps) {
-  const [analysisStatus, setAnalysisStatus] = useState(initialStatus);
-  const [isLoading, setIsLoading] = useState(initialLoading);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  // Auto-refresh functionality
+  // Update last updated time when analysis status changes
   useEffect(() => {
-    if (!technologyId || !analysisStatus) return;
-
-    const shouldPoll = Object.values(analysisStatus.components).some(
-      (component) => component.status === 'processing' || component.status === 'pending'
-    );
-
-    if (!shouldPoll) return;
-
-    const interval = setInterval(async () => {
-      try {
-        const updatedStatus = await getAnalysisStatus(technologyId);
-        setAnalysisStatus(updatedStatus);
-        setLastUpdated(new Date());
-
-        // Stop polling if all components are complete or have errors
-        const allCompleteOrError = Object.values(updatedStatus.components).every(
-          (component) => component.status === 'complete' || component.status === 'error'
-        );
-
-        if (allCompleteOrError) {
-          // Refresh the page when analysis is complete
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error('Error polling analysis status:', error);
-      }
-    }, analysisStatus.pollingRecommendation?.intervalMs || 7000);
-
-    return () => clearInterval(interval);
-  }, [technologyId, analysisStatus]);
-
-  const handleRefresh = async () => {
-    if (!technologyId) return;
-
-    setIsLoading(true);
-    try {
-      const updatedStatus = await getAnalysisStatus(technologyId);
-      setAnalysisStatus(updatedStatus);
+    if (analysisStatus) {
       setLastUpdated(new Date());
-    } catch (error) {
-      console.error('Error refreshing analysis status:', error);
     }
-    setIsLoading(false);
+  }, [analysisStatus]);
+
+  const handleRefresh = () => {
+    if (onRefresh) {
+      onRefresh();
+    }
   };
   if (isLoading || !analysisStatus) {
     return (
@@ -177,8 +144,20 @@ export function ProgressIndicator({
             </div>
             <Progress value={progressPercentage} className="h-3" />
             <div className="flex justify-between text-xs text-gray-600">
-              <span>
-                {progressPercentage === 100 ? 'Analysis complete!' : 'Analysis in progress...'}
+              <span className="flex items-center gap-1">
+                {progressPercentage === 100 ? (
+                  <>
+                    <CheckCircle className="h-3 w-3 text-green-600" />
+                    Analysis complete!
+                  </>
+                ) : isPolling ? (
+                  <>
+                    <Loader2 className="h-3 w-3 animate-spin text-blue-600" />
+                    Auto-updating...
+                  </>
+                ) : (
+                  'Analysis in progress...'
+                )}
               </span>
               <span>Last updated: {lastUpdated.toLocaleTimeString()}</span>
             </div>

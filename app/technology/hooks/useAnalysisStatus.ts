@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import getAnalysisStatus, { AnalysisStatusResponse } from '@/actions/getAnalysisStatus';
 
 interface UseAnalysisStatusProps {
@@ -12,88 +12,128 @@ export function useAnalysisStatus({ technologyId, enabled = true }: UseAnalysisS
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatusResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const isPollingActiveRef = useRef(false);
 
   const fetchStatus = useCallback(async () => {
-    if (!enabled) return;
+    if (!enabled) return null;
 
     try {
       setError(null);
       const status = await getAnalysisStatus(technologyId);
       setAnalysisStatus(status);
       setIsLoading(false);
+      return status;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch analysis status');
       setIsLoading(false);
+      return null;
     }
   }, [technologyId, enabled]);
 
-  useEffect(() => {
-    if (!enabled) return;
+  const stopPolling = useCallback(() => {
+    if (pollingRef.current) {
+      clearTimeout(pollingRef.current);
+      pollingRef.current = null;
+    }
+    isPollingActiveRef.current = false;
+  }, []);
 
-    // Initial fetch
-    fetchStatus();
+  const startPolling = useCallback(async () => {
+    if (!enabled || isPollingActiveRef.current) return;
 
-    // Set up polling
-    const poll = async () => {
+    isPollingActiveRef.current = true;
+
+    const poll = async (): Promise<void> => {
+      if (!isPollingActiveRef.current) return;
+
       try {
         const status = await getAnalysisStatus(technologyId);
         setAnalysisStatus(status);
 
-        // Stop polling if all components are complete or have errors
+        // Check if all components are complete or have errors
         const allCompleteOrError = Object.values(status.components).every(
           (component) => component.status === 'complete' || component.status === 'error'
         );
 
         if (allCompleteOrError) {
-          return false; // Stop polling
+          console.log('Analysis complete, stopping polling');
+          stopPolling();
+          return;
         }
 
-        return true; // Continue polling
+        // Continue polling if still active
+        if (isPollingActiveRef.current) {
+          const interval = Math.max(15000, status.pollingRecommendation?.intervalMs || 18000);
+          pollingRef.current = setTimeout(poll, interval);
+        }
       } catch (err) {
         console.error('Polling error:', err);
-        return true; // Continue polling even on error
-      }
-    };
-
-    let timeoutId: NodeJS.Timeout;
-
-    const startPolling = () => {
-      poll().then((shouldContinue) => {
-        if (shouldContinue) {
-          const interval = analysisStatus?.pollingRecommendation?.intervalMs || 7000;
-          timeoutId = setTimeout(startPolling, interval);
+        // Continue polling on error, but with a longer interval to reduce load
+        if (isPollingActiveRef.current) {
+          pollingRef.current = setTimeout(poll, 30000); // 30 seconds on error
         }
-      });
+      }
     };
 
-    // Start polling after initial fetch
-    if (analysisStatus) {
-      const allCompleteOrError = Object.values(analysisStatus.components).every(
-        (component) => component.status === 'complete' || component.status === 'error'
-      );
+    // Start the polling loop
+    poll();
+  }, [technologyId, enabled, stopPolling]);
 
-      if (!allCompleteOrError) {
-        const interval = analysisStatus.pollingRecommendation?.intervalMs || 7000;
-        timeoutId = setTimeout(startPolling, interval);
-      }
+  useEffect(() => {
+    if (!enabled) {
+      stopPolling();
+      return;
     }
 
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+    // Initial fetch
+    fetchStatus().then((status) => {
+      if (status) {
+        // Check if we need to start polling
+        const allCompleteOrError = Object.values(status.components).every(
+          (component) => component.status === 'complete' || component.status === 'error'
+        );
+
+        if (!allCompleteOrError) {
+          // Small delay before starting polling to avoid immediate re-fetch
+          setTimeout(
+            () => {
+              startPolling();
+            },
+            Math.max(15000, status.pollingRecommendation?.intervalMs || 18000)
+          );
+        } else {
+          console.log('Analysis already complete, no polling needed');
+        }
       }
+    });
+
+    return () => {
+      stopPolling();
     };
-  }, [fetchStatus, analysisStatus, enabled]);
+  }, [technologyId, enabled, fetchStatus, startPolling, stopPolling]);
 
   const refetch = useCallback(() => {
     setIsLoading(true);
-    fetchStatus();
-  }, [fetchStatus]);
+    stopPolling();
+    fetchStatus().then((status) => {
+      if (status) {
+        const allCompleteOrError = Object.values(status.components).every(
+          (component) => component.status === 'complete' || component.status === 'error'
+        );
+
+        if (!allCompleteOrError) {
+          startPolling();
+        }
+      }
+    });
+  }, [fetchStatus, startPolling, stopPolling]);
 
   return {
     analysisStatus,
     isLoading,
     error,
     refetch,
+    isPolling: isPollingActiveRef.current,
   };
 }
