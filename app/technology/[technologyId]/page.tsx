@@ -204,7 +204,10 @@ const TechnologyPage: React.FC<TechnologyPageProps> = ({ params }) => {
 
   return (
     <div className="container mx-auto p-4 px-4">
-      <ReportDownloader reportName="Medical-Technology-Analysis-Report.pdf">
+      <ReportDownloader
+        reportName="Medical-Technology-Analysis-Report.pdf"
+        analysisStatus={analysisStatus}
+      >
         <div className="space-y-6" style={{ maxWidth: '1000px', margin: '0 auto' }}>
           {/* Progress Indicator */}
           <ProgressIndicator

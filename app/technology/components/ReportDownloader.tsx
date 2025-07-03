@@ -4,18 +4,26 @@ import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useReactToPrint } from 'react-to-print';
+import { AnalysisStatusResponse } from '@/actions/getAnalysisStatus';
 
 interface ReportDownloaderProps {
   children: React.ReactNode;
   reportName?: string;
+  analysisStatus?: AnalysisStatusResponse | null;
 }
 
 export const ReportDownloader: React.FC<ReportDownloaderProps> = ({
   children,
   reportName = 'Medical-Technology-Analysis-Report',
+  analysisStatus,
 }) => {
   const reportContentRef = useRef<HTMLDivElement>(null);
   const [isPrinting, setIsPrinting] = useState(false);
+
+  // Check if analysis is complete
+  const isAnalysisComplete = analysisStatus
+    ? Object.values(analysisStatus.components).every((component) => component.status === 'complete')
+    : false;
 
   // Set up the print handler - using the correct TypeScript types
   const handlePrint = useReactToPrint({
@@ -61,19 +69,25 @@ export const ReportDownloader: React.FC<ReportDownloaderProps> = ({
 
       <div className="hide-from-pdf mb-4 flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-800">Technology Analysis Report</h2>
-        <Button onClick={handlePrint} disabled={isPrinting} variant="outline" size="sm">
-          {isPrinting ? (
-            <>
-              <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
-              Preparing...
-            </>
-          ) : (
-            <>
-              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-              Download PDF
-            </>
-          )}
-        </Button>
+        {isAnalysisComplete ? (
+          <Button onClick={handlePrint} disabled={isPrinting} variant="outline" size="sm">
+            {isPrinting ? (
+              <>
+                <ArrowPathIcon className="mr-2 h-4 w-4 animate-spin" />
+                Preparing...
+              </>
+            ) : (
+              <>
+                <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+                Download PDF
+              </>
+            )}
+          </Button>
+        ) : (
+          <div className="text-sm text-gray-500">
+            Analysis in progress - PDF will be available when complete
+          </div>
+        )}
       </div>
 
       {/* The content to be printed - this ref is crucial */}
