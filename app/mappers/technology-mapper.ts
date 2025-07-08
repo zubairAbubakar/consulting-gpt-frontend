@@ -8,6 +8,7 @@ export const mapTechnology = (technologyRaw: TechnologyRaw): Technology => {
     numOfAxes: technologyRaw.num_of_axes,
     searchKeywords: technologyRaw.search_keywords,
     problemStatement: technologyRaw.problem_statement,
+    marketAnalysisSummary: technologyRaw.market_analysis_summary,
     createdAt: technologyRaw.created_at,
     updatedAt: technologyRaw.updated_at,
   };

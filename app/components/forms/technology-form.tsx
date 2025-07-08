@@ -41,7 +41,7 @@ const TechnologyForm = () => {
     defaultValues: {
       name: '',
       abstract: '',
-      number_of_axis: '',
+      num_of_axes: '',
     },
   });
 
@@ -58,7 +58,7 @@ const TechnologyForm = () => {
       toast.success(`Technology "${values.name}" has been submitted for evaluation!.`, {
         id: loadingToastId,
         description: `ID: ${response.data.id}. We'll guide you through the analysis.`,
-        duration: 7000,
+        duration: 10000,
         action: {
           label: 'View Report',
           onClick: () => router.push(`/technology/${response.data.id}/`),
@@ -124,7 +124,7 @@ const TechnologyForm = () => {
 
             <FormField
               control={form.control}
-              name="number_of_axis"
+              name="num_of_axes"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 font-medium text-gray-700">

@@ -31,6 +31,7 @@ import { RelatedPapersSection } from '../components/RelatedPapersSectionModular'
 import { MarketAnalysisSection } from '../components/MarketAnalysisSection';
 import { PcaVisualizationSection } from '../components/PcaVisualizationSection';
 import { MedicalAssessmentSection } from '../components/MedicalAssessmentSection';
+import { Technology } from '@/types/technology';
 
 interface TechnologyPageProps {
   params: Promise<{
@@ -43,7 +44,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = ({ params }) => {
   const [technologyId, setTechnologyId] = useState<string>('');
 
   // State for data
-  const [technology, setTechnology] = useState<any>(null);
+  const [technology, setTechnology] = useState<Technology | null>(null);
   const [comparisonAxes, setComparisonAxes] = useState<ComparisonAxis[]>([]);
   const [relatedPatents, setRelatedPatents] = useState<RelatedPatent[]>([]);
   const [papers, setPapers] = useState<any[]>([]);
@@ -307,6 +308,7 @@ const TechnologyPage: React.FC<TechnologyPageProps> = ({ params }) => {
           {/* Section 5: Market Analysis Insights */}
           <MarketAnalysisSection
             analysisStatus={analysisStatus}
+            technologyId={technology.id}
             marketAnalysisData={marketAnalysisData}
             comparisonAxes={comparisonAxes}
             relatedPatents={relatedPatents}
