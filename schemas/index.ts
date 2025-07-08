@@ -14,10 +14,10 @@ export const TechnologySchema = z.object({
       message: 'Abstract must be at least 50 characters.',
     })
     .max(2000, { message: "Abstract can't exceed 2000 characters." }),
-  number_of_axis: z
+  num_of_axes: z
     .string()
     .min(1, {
-      message: 'Number of axis must be at least 3.',
+      message: 'Number of axes must be at least 3.',
     })
-    .max(10, { message: "Number of axis can't exceed 10." }),
+    .max(10, { message: "Number of axes can't exceed 10." }),
 });

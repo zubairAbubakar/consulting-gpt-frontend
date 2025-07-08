@@ -57,11 +57,11 @@ const navConfig = [
     originalPageHref: '/technology/pca-visualization',
   },
   {
-    name: 'Billable Items',
-    id: 'billing',
+    name: 'Meidcal Assessment',
+    id: 'medical-assessment',
     icon: BanknotesIcon,
-    sectionId: 'billing',
-    originalPageHref: '/technology/billing',
+    sectionId: 'medical-assessment',
+    originalPageHref: '/technology/medical-assessment',
   },
 ];
 
@@ -127,7 +127,7 @@ export function HorizontalNav() {
   });
 
   return (
-    <nav className="border-b border-gray-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+    <nav className="border-b border-gray-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div
           className="-mb-px flex space-x-4 overflow-x-auto sm:space-x-6 lg:space-x-8"
@@ -139,17 +139,15 @@ export function HorizontalNav() {
               href={step.href}
               className={classNames(
                 step.isActive
-                  ? 'border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-300',
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
                 'group inline-flex items-center whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium'
               )}
               aria-current={step.isActive ? 'page' : undefined}
             >
               <step.icon
                 className={classNames(
-                  step.isActive
-                    ? 'text-blue-500 dark:text-blue-400'
-                    : 'text-gray-400 group-hover:text-gray-500 dark:text-slate-500 dark:group-hover:text-slate-400',
+                  step.isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500',
                   'mr-2 h-5 w-5 flex-shrink-0'
                 )}
                 aria-hidden="true"

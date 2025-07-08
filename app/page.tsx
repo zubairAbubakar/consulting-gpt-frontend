@@ -8,7 +8,7 @@ console.log('TechnologyForm component loaded', TechnologyForm);
 export interface FormData {
   name: string;
   abstract: string;
-  number_of_axis: string;
+  num_of_axes: string;
 }
 
 const Index = () => {
