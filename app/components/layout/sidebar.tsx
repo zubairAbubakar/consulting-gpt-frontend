@@ -71,7 +71,7 @@ export const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
           </Link>
         )}
         <button
-          className="absolute top-9 -right-3 flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400"
+          className="absolute -right-3 top-9 flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400"
           onClick={() => setCollapsed(!collapsed)}
         >
           {collapsed ? (
@@ -110,4 +110,4 @@ export const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
       </div>
     </aside>
   );
-}
+};
