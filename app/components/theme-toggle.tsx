@@ -11,7 +11,8 @@ export function ThemeToggle() {
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
-    return ( // Render a placeholder or null to avoid hydration mismatch
+    return (
+      // Render a placeholder or null to avoid hydration mismatch
       <button className="rounded-full p-1.5 text-transparent">
         <SunIcon className="h-5 w-5 sm:h-6 sm:w-6" />
       </button>

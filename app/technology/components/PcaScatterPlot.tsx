@@ -487,8 +487,8 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
               </div>
             </div>
             <p className="mt-2 text-xs text-gray-500">
-              Refer to the "Interpreting the Axes" section above to understand what high/low PC1 and
-              PC2 values signify based on the data.
+              Refer to the &quot;Interpreting the Axes&quot; section above to understand what
+              high/low PC1 and PC2 values signify based on the data.
             </p>
           </div>
         </div>
