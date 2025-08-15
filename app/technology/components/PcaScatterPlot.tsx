@@ -187,6 +187,13 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
   const isNodeInActiveCluster = (nodeName: string): boolean => {
     if (!activeClusterId) return false;
     const cluster = clusters.find((c) => c.id === activeClusterId);
+
+    // For "Your Technology", use the contains_target property
+    if (nodeName === yourTechnologyName) {
+      return cluster?.contains_target || false;
+    }
+
+    // For other technologies, use exact name matching
     return cluster?.members.some((member) => member.name === nodeName) || false;
   };
 
@@ -209,31 +216,45 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
     let opacity = 0.85;
 
     const nodeName = (node.data as any).name as string;
+    const isYourTech = node.serieId === 'Your Technology';
 
     if (activeClusterId) {
-      if (isNodeInActiveCluster(nodeName)) {
-        finalSize = node.serieId === 'Your Technology' ? 16 : 12;
+      const isInActiveCluster = isNodeInActiveCluster(nodeName);
+
+      if (isInActiveCluster) {
+        // Point is in the active cluster - make it visible
+        finalSize = isYourTech ? 16 : 12;
+        opacity = 1;
+        // Keep the original colors (set by Nivo's colors prop)
+        if (isYourTech) {
+          finalColor = '#ff6384';
+        } else {
+          finalColor = '#36a2eb';
+        }
+      } else {
+        // Point is NOT in active cluster
+        if (isYourTech) {
+          // Hide "Your Technology" when not in active cluster
+          opacity = 0.15;
+          finalSize = 8;
+          finalColor = '#ff6384'; // Keep color but very faint
+        } else {
+          // Dim other technologies
+          opacity = 0.3;
+          finalSize = 8;
+          finalColor = '#cbd5e1'; // Muted color for dimmed points
+        }
+      }
+    } else {
+      // No active cluster - show all with default styling
+      if (isYourTech) {
+        finalColor = '#ff6384';
         opacity = 1;
       } else {
-        opacity = 0.3;
-        finalSize = 8; // Optionally make non-active cluster nodes smaller
+        finalColor = '#36a2eb';
+        opacity = 0.85;
       }
     }
-
-    // Specific color for "Your Technology"
-    if (node.serieId === 'Your Technology') {
-      finalColor = '#ff6384';
-      if (!activeClusterId || isNodeInActiveCluster(nodeName)) {
-        opacity = 1;
-      }
-    } else if (activeClusterId && !isNodeInActiveCluster(nodeName)) {
-      finalColor = '#cbd5e1'; // Muted color for dimmed points not part of "Your Technology"
-    } else if (!activeClusterId) {
-      // Default color for related tech when no cluster is active
-      finalColor = '#36a2eb';
-    }
-    // If it's a related technology and in the active cluster, it will retain its original series color
-    // or the #36a2eb if that was its base.
 
     // Nivo's event handlers expect the node and the event.
     // We need to wrap them if we're attaching to a standard SVG element.
@@ -256,8 +277,8 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
         cy={currentY}
         r={finalSize / 2} // Nivo's size is diameter-like, so divide by 2 for radius
         fill={finalColor}
-        stroke={node.serieId === 'Your Technology' ? 'rgba(0,0,0,0.5)' : 'none'}
-        strokeWidth={node.serieId === 'Your Technology' ? 1 : 0}
+        stroke="none" // Remove border outline for cleaner look
+        strokeWidth={0}
         style={{ mixBlendMode: blendMode, opacity: opacity }}
         onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}
@@ -287,6 +308,7 @@ export const PcaScatterPlot: React.FC<PcaScatterPlotProps> = ({
             margin={{ top: 60, right: 140, bottom: 90, left: 90 }} // Increased bottom margin for longer legend
             xScale={{ type: 'linear', min: 'auto', max: 'auto' }}
             yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
+            colors={['#36a2eb', '#ff6384']} // Explicit colors: Related Technologies, Your Technology
             blendMode="multiply"
             axisTop={null}
             axisRight={null}

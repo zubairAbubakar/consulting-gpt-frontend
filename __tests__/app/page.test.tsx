@@ -12,7 +12,7 @@ describe('Home Page (Index)', () => {
   it('renders the main title', () => {
     render(<Index />);
     expect(
-      screen.getByRole('heading', { name: 'Medical Technology Commercial Evaluator' })
+      screen.getByRole('heading', { name: 'Health Technology Assessment (HTA)' })
     ).toBeInTheDocument();
   });
 
@@ -41,7 +41,7 @@ describe('Home Page (Index)', () => {
     render(<Index />);
 
     const mainHeading = screen.getByRole('heading', {
-      name: 'Medical Technology Commercial Evaluator',
+      name: 'Health Technology Assessment (HTA)',
     });
     expect(mainHeading.tagName).toBe('H1');
   });
