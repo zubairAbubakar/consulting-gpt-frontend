@@ -39,9 +39,9 @@ const TechnologyForm = () => {
     defaultValues: {
       name: '',
       abstract: '',
-      number_of_patents: '',
-      number_of_papers: '',
-      number_of_axes: '',
+      number_of_related_patents: '',
+      number_of_related_papers: '',
+      num_of_axes: '',
     },
   });
 
@@ -140,7 +140,7 @@ const TechnologyForm = () => {
             />
             <FormField
               control={form.control}
-              name="number_of_patents"
+              name="number_of_related_patents"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
@@ -162,7 +162,7 @@ const TechnologyForm = () => {
             />
             <FormField
               control={form.control}
-              name="number_of_papers"
+              name="number_of_related_papers"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
@@ -185,7 +185,7 @@ const TechnologyForm = () => {
 
             <FormField
               control={form.control}
-              name="number_of_axes"
+              name="num_of_axes"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
