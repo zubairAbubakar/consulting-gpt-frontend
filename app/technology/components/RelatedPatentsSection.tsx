@@ -30,7 +30,7 @@ export function RelatedPatentsSection({
           <CardHeader className="rounded-t-lg bg-gradient-to-r from-purple-500 to-pink-600 px-6 py-4 text-white">
             <CardTitle className="flex items-center gap-2 text-xl font-semibold">
               <DocumentMagnifyingGlassIcon className="h-5 w-5" />
-              Related Patents & Papers
+              Related Patents
             </CardTitle>
             <CardDescription className="text-purple-100">
               Some related patents to your technology
@@ -95,15 +95,15 @@ export function RelatedPatentsSection({
                       )}
                     </div>
 
-                    {doc.url && (
+                    {doc.documentId && (
                       <div className="mt-3">
                         <a
-                          href={doc.url}
+                          href={`https://patents.google.com/${doc.documentId}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
                         >
-                          View Document <ExternalLinkIcon className="h-3 w-3" />
+                          View patent <ExternalLinkIcon className="h-3 w-3" />
                         </a>
                       </div>
                     )}
@@ -124,7 +124,7 @@ export function RelatedPatentsSection({
   return (
     <div id="patents">
       <SectionSkeleton
-        title="Related Patents & Papers"
+        title="Related Patents"
         description="Some related patents to your technology"
         icon={<DocumentMagnifyingGlassIcon className="h-5 w-5" />}
         status={status as 'pending' | 'processing' | 'error'}

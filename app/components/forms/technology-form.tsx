@@ -19,7 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Briefcase, Mail, Notebook, User } from 'lucide-react';
+import { Briefcase, Mail, Notebook } from 'lucide-react';
 import { FormData } from '@/app/page';
 import { TechnologySchema } from '@/schemas';
 import axios from 'axios';
@@ -28,11 +28,9 @@ import { FormSuccess } from './form-success';
 import LightBulbIcon from '@heroicons/react/24/outline/LightBulbIcon';
 import ScaleIcon from '@heroicons/react/24/outline/ScaleIcon';
 
-console.log('Card Content component loaded', CardContent);
-
 const TechnologyForm = () => {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isPending] = useTransition();
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
 
@@ -41,15 +39,15 @@ const TechnologyForm = () => {
     defaultValues: {
       name: '',
       abstract: '',
-      num_of_axes: '',
+      number_of_patents: '',
+      number_of_papers: '',
+      number_of_axes: '',
     },
   });
 
   const onSubmit = async (values: z.infer<typeof TechnologySchema>) => {
     setError('');
     setSuccess('');
-
-    console.log('values', values);
 
     const loadingToastId = toast.loading('Processing your technology submission...');
 
@@ -58,7 +56,7 @@ const TechnologyForm = () => {
       toast.success(`Technology "${values.name}" has been submitted for evaluation!.`, {
         id: loadingToastId,
         description: `ID: ${response.data.id}. We'll guide you through the analysis.`,
-        duration: 10000,
+        duration: 7000,
         action: {
           label: 'View Report',
           onClick: () => router.push(`/technology/${response.data.id}/`),
@@ -80,12 +78,9 @@ const TechnologyForm = () => {
         duration: 7000,
       });
     } finally {
+      // cleanup if needed
     }
   };
-
-  async function handleSubmit(data: FormData) {
-    onSubmit(data);
-  }
 
   return (
     <Card className="mx-auto w-full max-w-2xl border-0 bg-white/80 shadow-xl backdrop-blur-sm">
@@ -124,29 +119,6 @@ const TechnologyForm = () => {
 
             <FormField
               control={form.control}
-              name="num_of_axes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
-                    <ScaleIcon className="h-4 w-4" />
-                    Number of Axis
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Enter the number of axis (1-5)"
-                      {...field}
-                      className="border-gray-300 transition-colors focus:border-blue-500 focus:ring-blue-500"
-                      disabled={isPending}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="abstract"
               render={({ field }) => (
                 <FormItem>
@@ -159,6 +131,73 @@ const TechnologyForm = () => {
                       placeholder="Describe your techonogy in detail..."
                       className="min-h-[120px] resize-none border-gray-300 transition-colors focus:border-blue-500 focus:ring-blue-500"
                       {...field}
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="number_of_patents"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
+                    <Briefcase className="h-4 w-4" />
+                    Number of Related Patents
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter the number of related patents"
+                      {...field}
+                      className="border-gray-300 transition-colors focus:border-blue-500 focus:ring-blue-500"
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="number_of_papers"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
+                    <Mail className="h-4 w-4" />
+                    Number of Related Papers
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter the number of related papers"
+                      {...field}
+                      className="border-gray-300 transition-colors focus:border-blue-500 focus:ring-blue-500"
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="number_of_axes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2 font-medium text-gray-700">
+                    <ScaleIcon className="h-4 w-4" />
+                    Number of Axes
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Enter the number of axes (1-5)"
+                      {...field}
+                      className="border-gray-300 transition-colors focus:border-blue-500 focus:ring-blue-500"
                       disabled={isPending}
                     />
                   </FormControl>

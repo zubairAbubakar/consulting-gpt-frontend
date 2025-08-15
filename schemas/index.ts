@@ -14,7 +14,19 @@ export const TechnologySchema = z.object({
       message: 'Abstract must be at least 50 characters.',
     })
     .max(2000, { message: "Abstract can't exceed 2000 characters." }),
-  num_of_axes: z
+  number_of_patents: z
+    .string()
+    .min(1, {
+      message: 'Number of patents must be at least 1.',
+    })
+    .max(100, { message: "Number of patents can't exceed 100." }),
+  number_of_papers: z
+    .string()
+    .min(1, {
+      message: 'Number of papers must be at least 1.',
+    })
+    .max(100, { message: "Number of papers can't exceed 100." }),
+  number_of_axes: z
     .string()
     .min(1, {
       message: 'Number of axes must be at least 3.',

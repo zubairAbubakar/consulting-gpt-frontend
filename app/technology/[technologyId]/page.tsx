@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 import { Siren, Microscope, Diff, Notebook, Key } from 'lucide-react';
@@ -19,14 +18,11 @@ import { ComparisonAxis } from '@/types/comparison-axis';
 import { RelatedPatent } from '@/types/related-patent';
 import { getPcaVisualizationData } from '@/actions/getPcaVisualizationData';
 import { getMedicalAssessment } from '@/actions/getMedicalAssessment';
-import { Button } from '@/components/ui/button';
 import { ReportDownloader } from '../components/ReportDownloader';
-import getAnalysisStatus from '@/actions/getAnalysisStatus';
 import { ProgressIndicator } from '../components/ProgressIndicator';
-import { SectionSkeleton } from '../components/SectionSkeleton';
 import { useAnalysisStatus } from '../hooks/useAnalysisStatus';
 import { ComparisonAxesSection } from '../components/ComparisonAxesSection';
-import { RelatedPatentsSection } from '../components/RelatedPapersSection';
+import { RelatedPatentsSection } from '../components/RelatedPatentsSection';
 import { RelatedPapersSection } from '../components/RelatedPapersSectionModular';
 import { MarketAnalysisSection } from '../components/MarketAnalysisSection';
 import { PcaVisualizationSection } from '../components/PcaVisualizationSection';
