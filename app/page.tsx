@@ -5,9 +5,9 @@ import TechnologyForm from './components/forms/technology-form';
 export interface FormData {
   name: string;
   abstract: string;
-  number_of_patents: string;
-  number_of_papers: string;
-  number_of_axes: string;
+  number_of_related_patents: string;
+  number_of_related_papers: string;
+  num_of_axes: string;
 }
 
 const Index = () => {
